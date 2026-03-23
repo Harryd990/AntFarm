@@ -14,16 +14,40 @@ namespace AntFarm.main
 {
     /*
      * to do:
+     * need to add radial dial 
+     * add starting menu so when player loads in they set the grid size and stuff PERMINANTLY 
+     * add saving and loading of game state 
+     * canceling inputs
      * 
-     *  queen promotion check isnt working too 
-     *  the farmwork task is being called multiple times there shold be a check in the update farms task to see if there is already a farm work task for that farm or if there is an ant currently working on the farm before adding a new farm work task to the queue
-     * add saving to text file (easy marks)
-     * ants maight not being assigned wander tasks enough
+     * what goes on what 
      * 
-     * to do on wpf:
-     * add a slider for ideal population so queen makes babys up to slider max 
-     * make it so the user can cancle half way through a input (eg build dig etc)
-     * add auto ticking and speed dial 
+     * create and destroy:
+     * - build farm
+     * - build food store
+     * - dig
+     * - remove building
+     * 
+     * settings:
+     * - ideal population
+     * - exit game 
+     * - save game 
+     * - get statistics (eg ants ages and food count how many ants have died ...)
+     * 
+     * Dev tools:
+     * - spawn entity (eg queen worker food farm food store at mouse position for testing)
+     * - remove area 
+     * - get cell details 
+     * - edit entity details (eg change food amount in food store or food source or change ant food or age or something)
+     * 
+     * possible bugs
+     * - queen promotaion might not be working
+     * - the farmwork task is being called multiple times 
+     * - ants maight not being assigned wander tasks enough
+     *  
+     * 
+     * 
+     * 
+     * 
      * */
 
     public class Game

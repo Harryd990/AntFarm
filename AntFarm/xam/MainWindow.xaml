@@ -25,13 +25,13 @@
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
                     <Border Grid.Row="0" BorderBrush="Black" BorderThickness="0,0,1,1">
-                        <TextBlock Text="Option 1" VerticalAlignment="Center" Margin="6,0" FontSize="11"/>
+                        <TextBlock Text="Create and destroy" VerticalAlignment="Center" Margin="6,0" FontSize="11"/>
                     </Border>
                     <Border Grid.Row="1" BorderBrush="Black" BorderThickness="0,0,1,1">
-                        <TextBlock Text="Option 2" VerticalAlignment="Center" Margin="6,0" FontSize="11"/>
+                        <TextBlock Text="Settings" VerticalAlignment="Center" Margin="6,0" FontSize="11"/>
                     </Border>
                     <Border Grid.Row="2" BorderBrush="Black" BorderThickness="0,0,1,0">
-                        <TextBlock Text="Option 3" VerticalAlignment="Center" Margin="6,0" FontSize="11"/>
+                        <TextBlock Text="Dev tools" VerticalAlignment="Center" Margin="6,0" FontSize="11"/>
                     </Border>
                 </Grid>
                 <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,1,0">
@@ -70,119 +70,41 @@
                         </ScrollViewer>
                     </Grid>
                 </Border>
-                <Grid Grid.Column="3" VerticalAlignment="Center" HorizontalAlignment="Center">
-                    <Canvas Width="80" Height="80">
-                        <!-- Donut: black base -->
-                        <Ellipse Canvas.Left="1" Canvas.Top="1" Width="78" Height="78" Fill="Black"/>
-                        <!-- Donut: speed segments (gray) -->
-                        <!-- Speed 3: 360-320deg (top-right) -->
-                        <Path Fill="Gray" Stroke="Black" StrokeThickness="1.5">
-                            <Path.Data>
-                                <PathGeometry>
-                                    <PathFigure StartPoint="62,40" IsClosed="True">
-                                        <ArcSegment Point="56.9,22.5" Size="22,22" SweepDirection="Counterclockwise" IsLargeArc="False"/>
-                                        <LineSegment Point="70.6,15.0"/>
-                                        <ArcSegment Point="78,40" Size="38,38" SweepDirection="Clockwise" IsLargeArc="False"/>
-                                        <LineSegment Point="62,40"/>
-                                    </PathFigure>
-                                </PathGeometry>
-                            </Path.Data>
-                        </Path>
-                        <!-- Speed 2: 320-280deg (right-bottom) -->
-                        <Path Fill="Gray" Stroke="Black" StrokeThickness="1.5">
-                            <Path.Data>
-                                <PathGeometry>
-                                    <PathFigure StartPoint="56.9,22.5" IsClosed="True">
-                                        <ArcSegment Point="46.6,18.4" Size="22,22" SweepDirection="Counterclockwise" IsLargeArc="False"/>
-                                        <LineSegment Point="54.0,4.0"/>
-                                        <ArcSegment Point="70.6,15.0" Size="38,38" SweepDirection="Clockwise" IsLargeArc="False"/>
-                                        <LineSegment Point="56.9,22.5"/>
-                                    </PathFigure>
-                                </PathGeometry>
-                            </Path.Data>
-                        </Path>
-                        <!-- Speed 1: 280-240deg (bottom-left) -->
-                        <Path Fill="Gray" Stroke="Black" StrokeThickness="1.5">
-                            <Path.Data>
-                                <PathGeometry>
-                                    <PathFigure StartPoint="46.6,18.4" IsClosed="True">
-                                        <ArcSegment Point="25.0,25.6" Size="22,22" SweepDirection="Counterclockwise" IsLargeArc="False"/>
-                                        <LineSegment Point="21.0,13.2"/>
-                                        <ArcSegment Point="54.0,4.0" Size="38,38" SweepDirection="Clockwise" IsLargeArc="False"/>
-                                        <LineSegment Point="46.6,18.4"/>
-                                    </PathFigure>
-                                </PathGeometry>
-                            </Path.Data>
-                        </Path>
-                        <!-- Donut hole (white, with black border) -->
-                        <Ellipse Canvas.Left="18" Canvas.Top="18" Width="44" Height="44" Fill="White" Stroke="Black" StrokeThickness="1.5"/>
-                        <!-- Pause button: perfectly centered, no border/outline -->
-                        <Button x:Name="PauseButton"
-                                Canvas.Left="18" Canvas.Top="18"
-                                Width="44" Height="44"
-                                ToolTip="Pause" Click="PauseButton_Click" Cursor="Hand"
-                                Background="White" BorderBrush="White" BorderThickness="0">
-                            <Button.Template>
-                                <ControlTemplate TargetType="Button">
-                                    <TextBlock Text="&#x23F8;" FontSize="20"
-                                               HorizontalAlignment="Center"
-                                               VerticalAlignment="Center"
-                                               Foreground="Black"/>
-                                </ControlTemplate>
-                            </Button.Template>
-                        </Button>
-                        <!-- Speed buttons: centered on their gray arcs, all share center (40,40), radius 32 -->
-                        <!-- 1: 260° (bottom-left) -->
-                        <RadioButton x:Name="Speed1" GroupName="SpeedGroup"
-                                     IsChecked="True"
-                                     Canvas.Left="16" Canvas.Top="56"
-                                     Width="16" Height="16" Cursor="Hand">
-                            <RadioButton.Template>
-                                <ControlTemplate TargetType="RadioButton">
-                                    <TextBlock x:Name="Txt" Text="1" FontWeight="Bold" FontSize="11"
-                                               Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                    <ControlTemplate.Triggers>
-                                        <Trigger Property="IsChecked" Value="True">
-                                            <Setter TargetName="Txt" Property="Foreground" Value="Black"/>
-                                        </Trigger>
-                                    </ControlTemplate.Triggers>
-                                </ControlTemplate>
-                            </RadioButton.Template>
-                        </RadioButton>
-                        <!-- 2: 300° (right-bottom) -->
-                        <RadioButton x:Name="Speed2" GroupName="SpeedGroup"
-                                     Canvas.Left="56" Canvas.Top="56"
-                                     Width="16" Height="16" Cursor="Hand">
-                            <RadioButton.Template>
-                                <ControlTemplate TargetType="RadioButton">
-                                    <TextBlock x:Name="Txt" Text="2" FontWeight="Bold" FontSize="11"
-                                               Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                    <ControlTemplate.Triggers>
-                                        <Trigger Property="IsChecked" Value="True">
-                                            <Setter TargetName="Txt" Property="Foreground" Value="Black"/>
-                                        </Trigger>
-                                    </ControlTemplate.Triggers>
-                                </ControlTemplate>
-                            </RadioButton.Template>
-                        </RadioButton>
-                        <!-- 3: 340° (top-right) -->
-                        <RadioButton x:Name="Speed3" GroupName="SpeedGroup"
-                                     Canvas.Left="56" Canvas.Top="16"
-                                     Width="16" Height="16" Cursor="Hand">
-                            <RadioButton.Template>
-                                <ControlTemplate TargetType="RadioButton">
-                                    <TextBlock x:Name="Txt" Text="3" FontWeight="Bold" FontSize="11"
-                                               Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                    <ControlTemplate.Triggers>
-                                        <Trigger Property="IsChecked" Value="True">
-                                            <Setter TargetName="Txt" Property="Foreground" Value="Black"/>
-                                        </Trigger>
-                                    </ControlTemplate.Triggers>
-                                </ControlTemplate>
-                            </RadioButton.Template>
-                        </RadioButton>
-                    </Canvas>
+
+                <!-- Bottom-right: slider 0x .. 5x with 0.5 steps -->
+                <Grid Grid.Column="3" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="6">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Heading label -->
+                    <TextBlock Grid.Row="0" FontSize="12" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,4">Speed</TextBlock>
+
+                    <!-- Slider control -->
+                    <Slider Grid.Row="1" x:Name="SpeedSlider"
+                            Width="80"
+                            Minimum="0" Maximum="5"
+                            TickFrequency="0.5"
+                            IsSnapToTickEnabled="True"
+                            SmallChange="0.5"
+                            LargeChange="1"
+                            TickPlacement="TopLeft"
+                            ToolTip="Simulation speed multiplier"
+                            HorizontalAlignment="Center"/>
+
+                    <!-- Label row under the slider: labels every 1 from 0 to 5 (no 'x') -->
+                    <UniformGrid Grid.Row="2" Rows="1" Columns="6" Margin="0,6,0,0" HorizontalAlignment="Stretch">
+                        <TextBlock Text="0" FontSize="9" HorizontalAlignment="Center"/>
+                        <TextBlock Text="1" FontSize="9" HorizontalAlignment="Center"/>
+                        <TextBlock Text="2" FontSize="9" HorizontalAlignment="Center"/>
+                        <TextBlock Text="3" FontSize="9" HorizontalAlignment="Center"/>
+                        <TextBlock Text="4" FontSize="9" HorizontalAlignment="Center"/>
+                        <TextBlock Text="5" FontSize="9" HorizontalAlignment="Center"/>
+                    </UniformGrid>
                 </Grid>
+
             </Grid>
         </Border>
     </Grid>
