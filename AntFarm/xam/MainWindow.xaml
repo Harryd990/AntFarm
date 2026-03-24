@@ -71,7 +71,7 @@
                     </Grid>
                 </Border>
 
-                <!-- Bottom-right: slider 0x .. 5x with 0.5 steps -->
+                
                 <Grid Grid.Column="3" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="6">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -79,10 +79,10 @@
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
-                    <!-- Heading label -->
+                    
                     <TextBlock Grid.Row="0" FontSize="12" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,4">Speed</TextBlock>
 
-                    <!-- Slider control -->
+                    
                     <Slider Grid.Row="1" x:Name="SpeedSlider"
                             Width="80"
                             Minimum="0" Maximum="5"
@@ -94,7 +94,7 @@
                             ToolTip="Simulation speed multiplier"
                             HorizontalAlignment="Center"/>
 
-                    <!-- Label row under the slider: labels every 1 from 0 to 5 (no 'x') -->
+                    
                     <UniformGrid Grid.Row="2" Rows="1" Columns="6" Margin="0,6,0,0" HorizontalAlignment="Stretch">
                         <TextBlock Text="0" FontSize="9" HorizontalAlignment="Center"/>
                         <TextBlock Text="1" FontSize="9" HorizontalAlignment="Center"/>
