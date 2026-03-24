@@ -12,8 +12,8 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,30,0,20">
-            <Button Name="NewGameButton" Content="New Game" Width="120" Height="40" Margin="10"/>
-            <Button Name="LoadGameButton" Content="Load Game" Width="120" Height="40" Margin="10"/>
+            <Button Name="NewGameButton" Content="New Game" Width="120" Height="40" Margin="10" Click="NewGameButton_Click"/>
+            <Button Name="LoadGameButton" Content="Load Game" Width="120" Height="40" Margin="10" Click="LoadGameButton_Click"/>
         </StackPanel>
         <StackPanel Grid.Row="1" VerticalAlignment="Top" HorizontalAlignment="Center" Width="400" Margin="0,20,0,0">
             <!-- Grid Width Slider -->

@@ -67,6 +67,10 @@ namespace AntFarm.main
         public int tick { get; set; } = 0;
         public int lastEntityId { get; set; } = 0;
         public int QueenFoodCount => queen?.food ?? 0;
+
+        public int startingAntCount { get; set; } = 4;
+
+        public int StartingFodCount { get; set; } = 2;
         public void Initialise_Game()
         {
             // adds queen to centre of grid on the first bit of air 
@@ -74,7 +78,7 @@ namespace AntFarm.main
             queen = new Queen(0, 'Q');
             AddEntityToGameGrid(grid.width / 2, grid.height / 4 - 1, queen);
 
-            for (int i = 0; i <= 3; i++)
+            for (int i = 1; i <= startingAntCount; i++)
             {
                 // adds 4 workers along the first line of air
                 Entity Worker = new Worker(i, 'A'); 
@@ -93,7 +97,7 @@ namespace AntFarm.main
 
 
             }
-            for (int i = 0; i <= 1; i++)
+            for (int i = 1; i <= StartingFodCount; i++)
             {
                 // adds 2 bits of food in the air zone 
                 Entity food = new Food(lastEntityId++, 0, 0);

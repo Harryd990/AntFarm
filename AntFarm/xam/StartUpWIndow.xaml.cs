@@ -23,5 +23,15 @@ namespace AntFarm
         {
             InitializeComponent();
         }
+
+        private void NewGameButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void LoadGameButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }
