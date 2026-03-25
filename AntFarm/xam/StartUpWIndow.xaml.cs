@@ -21,6 +21,7 @@ namespace AntFarm
     /// </summary>
     public partial class StartUpWIndow : Window
     {
+        Game newgame;
         
         public StartUpWIndow()
         {
@@ -30,12 +31,17 @@ namespace AntFarm
 
         private void NewGameButton_Click(object sender, RoutedEventArgs e)
         {
-            Gamestart newgame = new Gamestart((int)GridWidthSlider.Value, (int)GridHeightSlider.Value, (int)AntCountSlider.Value, (int)FoodCountSlider.Value);
-            if(newgame!= null )
+            (newgame, bool isValid) = Gamestart.HandleNewGame(newgame, (int)GridWidthSlider.Value, (int)GridHeightSlider.Value, (int)AntCountSlider.Value, (int)FoodCountSlider.Value);
+
+            if (isValid)
             {
                 MainWindow mainWindow = new MainWindow();
                 mainWindow.Show();
                 this.Close();
+            }
+            else
+            {
+                MessageBox.Show("Too many ants and food for the grid size. Please adjust the values.");
             }
         }
 
