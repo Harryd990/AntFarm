@@ -19,25 +19,25 @@
             <!-- Grid Width Slider -->
             <TextBlock Text="Grid Width" Margin="0,10,0,0" FontWeight="Bold"/>
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                <Slider Name="GridWidthSlider" Minimum="4" Maximum="40" Value="20" TickFrequency="1" IsSnapToTickEnabled="True" Width="300"/>
+                <Slider Name="GridWidthSlider" Minimum="4" Maximum="40" Value="20" TickFrequency="1" IsSnapToTickEnabled="True" Width="300" ValueChanged="GridWidthSlider_ValueChanged"/>
                 <TextBlock Text="{Binding ElementName=GridWidthSlider, Path=Value}" Width="40" Margin="10,0,0,0" VerticalAlignment="Center"/>
             </StackPanel>
             <!-- Grid Height Slider -->
             <TextBlock Text="Grid Height" Margin="0,10,0,0" FontWeight="Bold"/>
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                <Slider Name="GridHeightSlider" Minimum="4" Maximum="40" Value="20" TickFrequency="1" IsSnapToTickEnabled="True" Width="300"/>
+                <Slider Name="GridHeightSlider" Minimum="4" Maximum="40" Value="20" TickFrequency="1" IsSnapToTickEnabled="True" Width="300" ValueChanged="GridHeightSlider_ValueChanged"/>
                 <TextBlock Text="{Binding ElementName=GridHeightSlider, Path=Value}" Width="40" Margin="10,0,0,0" VerticalAlignment="Center"/>
             </StackPanel>
             <!-- Starting Ant Count Slider -->
             <TextBlock Text="Starting Ant Count" Margin="0,10,0,0" FontWeight="Bold"/>
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                <Slider Name="AntCountSlider" Minimum="2" Maximum="20" Value="4" TickFrequency="1" IsSnapToTickEnabled="True" Width="300"/>
+                <Slider Name="AntCountSlider" Minimum="2" Maximum="20" Value="4" TickFrequency="1" IsSnapToTickEnabled="True" Width="300" ValueChanged="AntCountSlider_ValueChanged"/>
                 <TextBlock Text="{Binding ElementName=AntCountSlider, Path=Value}" Width="40" Margin="10,0,0,0" VerticalAlignment="Center"/>
             </StackPanel>
             <!-- Starting Food Count Slider -->
             <TextBlock Text="Starting Food Count" Margin="0,10,0,0" FontWeight="Bold"/>
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                <Slider Name="FoodCountSlider" Minimum="1" Maximum="10" Value="2" TickFrequency="1" IsSnapToTickEnabled="True" Width="300"/>
+                <Slider Name="FoodCountSlider" Minimum="1" Maximum="10" Value="2" TickFrequency="1" IsSnapToTickEnabled="True" Width="300" ValueChanged="FoodCountSlider_ValueChanged"/>
                 <TextBlock Text="{Binding ElementName=FoodCountSlider, Path=Value}" Width="40" Margin="10,0,0,0" VerticalAlignment="Center"/>
             </StackPanel>
         </StackPanel>

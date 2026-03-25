@@ -43,6 +43,7 @@ namespace AntFarm.main
      * - queen promotaion might not be working
      * - the farmwork task is being called multiple times 
      * - ants maight not being assigned wander tasks enough
+     * - when innitalising with sliders you can add more ants then there is space in grid
      *  
      * 
      * 
@@ -56,11 +57,20 @@ namespace AntFarm.main
         private Queen queen;
         public queue queue1 = new queue();
 
-        public Game(int width, int height)
+        public Game(int width, int height, int startants, int startfood)
         {
             grid = new Grid(width, height);
             queue1 = new queue();
+            int StartingFodCount = startfood;
+            int startingAntCount = startants;
+
         }
+         
+        int StartingFodCount { get; set; }
+        int startingAntCount { get; set; }
+
+
+
         public int workercount { get; set; } = 0;
         public int GridWidth => grid.width;
         public int GridHeight => grid.height;
@@ -68,9 +78,7 @@ namespace AntFarm.main
         public int lastEntityId { get; set; } = 0;
         public int QueenFoodCount => queen?.food ?? 0;
 
-        public int startingAntCount { get; set; } = 4;
-
-        public int StartingFodCount { get; set; } = 2;
+        
         public void Initialise_Game()
         {
             // adds queen to centre of grid on the first bit of air 
