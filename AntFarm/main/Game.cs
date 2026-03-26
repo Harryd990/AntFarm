@@ -14,7 +14,7 @@ namespace AntFarm.main
 {
     /*
      * to do:
-     * need to add radial dial 
+     * need to add speed stuff (game.step) 
      * add starting menu so when player loads in they set the grid size and stuff PERMINANTLY 
      * add saving and loading of game state 
      * canceling inputs
@@ -78,7 +78,11 @@ namespace AntFarm.main
         public int lastEntityId { get; set; } = 0;
         public int QueenFoodCount => queen?.food ?? 0;
 
-        
+        public (int,int) getGridDims()
+        {
+            return (grid.width, grid.height);
+        }
+
         public void Initialise_Game()
         {
             // adds queen to centre of grid on the first bit of air 
