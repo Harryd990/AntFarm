@@ -17,6 +17,7 @@ namespace AntFarm
             InitializeComponent();
             _game = game;
             _game.Initialise_Game();
+            _game.OnSimulationLog += OnGameLogMessage; 
 
             // 1. Initialize the UI Timer
             _simTimer = new DispatcherTimer();
@@ -32,8 +33,8 @@ namespace AntFarm
 
         private void SimTimer_Tick(object sender, EventArgs e)
         {
-            // Call your existing game tick method
-            _game.Run();
+            // Call the newly created single tick method
+            _game.UpdateTick();
 
             // Re-render the visual state on the canvas
             GridRenderer.Render(_game, MainCanvas);
@@ -105,5 +106,11 @@ namespace AntFarm
         private void RemoveArea_Click(object sender, RoutedEventArgs e) { }
         private void GetCellDetails_Click(object sender, RoutedEventArgs e) { }
         private void EditEntity_Click(object sender, RoutedEventArgs e) { }
+
+        private void OnGameLogMessage(string message)
+        {
+            
+            UpdatesText.Text += $"\n- {message}";
+        }
     }
 }

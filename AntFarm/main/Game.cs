@@ -53,6 +53,9 @@ namespace AntFarm.main
 
     public class Game
     {
+        // Add this line at the top of the Game class properties
+        public event Action<string> OnSimulationLog;
+
         public Grid grid;
         private Queen queen;
         public queue queue1 = new queue();
@@ -155,71 +158,56 @@ namespace AntFarm.main
         {
             grid.ReplaceCellAtLocation(x, y, newCell);
         }
-        public void Run()
+        public void UpdateTick()
         {
+            HungerAnts();
+            PrintAllTasksInQueue(); // Console.WriteLines are fine, they will go to the Output window
+            UgentHungerCheck();
 
-            bool running = true;
-            //Thread.Sleep(20); 
+            ProcessAntMovementAndTasks();
 
-            //grid.PrintGrid();
-            while (running)
+            GeneralTickUpdates();
+
+            if (checkforUnderGroundSpace() && queen.retreting == false)
             {
-                HungerAnts();
-                PrintAllTasksInQueue();
-                UgentHungerCheck();
-
-                //inputselector();
-                ProcessAntMovementAndTasks();
-                
-                GeneralTickUpdates();
-
-
-
-
-
-
-
-                // if queen has  food lay eggs 
-                // add stuff so queen has grace period on egg laying 
-                // mb later add queen preference to lay eggs underground cos currently spams eggs on the food source and guzzels it all 
-                if (checkforUnderGroundSpace() && queen.retreting == false)
+                if (queen != null && queen.food >= 60 && queen.EggGracePeriod <= 0)
                 {
-                    
-                    if (queen != null && queen.food >= 60 && queen.EggGracePeriod <= 0)
+                    algorithm.Task queenTask = new algorithm.Task(queue1.lasttaskid++, "queenretrete", queen.Position);
+                    if (queen.clamedtaskid == -1 || queen.Currenttask.tasktype == "wander")
                     {
-                        
-                        // we r getting to here but not fully working i aint asrsed rn 
-                        
-                        //throw new Exception("Queen is laying eggs");
-                        algorithm.Task queenTask = new algorithm.Task(queue1.lasttaskid++, "queenretrete", queen.Position);
-                        // return the queens current task to the queue as long as its not wander then assign the queen a new task 
-                        if (queen.clamedtaskid == -1 || queen.Currenttask.tasktype == "wander")
-                        {
-                            queen.Currenttask = queenTask;
-                            queen.retreting = true;
-                            queen.clamedtaskid = queenTask.id;
-                            
-                        }
-                        else
-                        {
-                            // add the queens current task to the queue and assign the new task to the queen
-
-                            queue1.addtask(queen.Currenttask);
-                            queen.Currenttask = queenTask;
-                            queen.retreting = true;
-                            queen.clamedtaskid = queenTask.id;
-                            
-
-                        }
-
+                        queen.Currenttask = queenTask;
+                        queen.retreting = true;
+                        queen.clamedtaskid = queenTask.id;
                     }
-
+                    else
+                    {
+                        queue1.addtask(queen.Currenttask);
+                        queen.Currenttask = queenTask;
+                        queen.retreting = true;
+                        queen.clamedtaskid = queenTask.id;
+                    }
                 }
+            }
 
-                 
+            tick++; // Don't forget to increment your tick counter
+        }
 
-
-                //Thread.Sleep(10);
+        public void dig(int x, int y)
+        {
+            if (grid.GetCellAtLocation(x, y) is Dirt)
+            {
+                Dirt dirtcell = (Dirt)grid.GetCellAtLocation(x, y);
+                dirtcell.digprogress++;
+                if (dirtcell.digprogress >= dirtcell.hardness)
+                {
+                    // replace with air cell
+                    ReplaceCellAtLocation(x, y, new Air(x, y));
+                    // Removed Console.Clear() and printgrid() to prevent crashes in WPF
+                }
+            }
+            else
+            {
+                throw new InvalidOperationException("Cell is not dirt");
             }
         }
         public bool checkforUnderGroundSpace()
@@ -785,8 +773,7 @@ namespace AntFarm.main
                         }
 
                         // Prevent movement while gestating/laying
-                        ant.path = new List<int>();
-
+                        ant.path = new List<int>(); // prevent movement while working
                         // Decrement gestationperiod and check for egg laying
                         q.gestationperiod--;
 
@@ -1246,33 +1233,12 @@ namespace AntFarm.main
                     var pos = ant.Position;
                     var cell = grid.GetCellAtLocation(pos.Item1, pos.Item2);
                     cell.RemoveEntity(ant);
-                    Console.WriteLine($"An ant has died of hunger at ({pos.Item1},{pos.Item2})");
+                    OnSimulationLog?.Invoke($"An ant has died of hunger at ({pos.Item1},{pos.Item2})");
                 }
             }
+            
         }
-        public void dig(int x, int y)
-        {
-            if (grid.GetCellAtLocation(x,y) is Dirt)
-            {
-                Dirt dirtcell = (Dirt)grid.GetCellAtLocation(x, y);
-                dirtcell.digprogress++;
-                if (dirtcell.digprogress >= dirtcell.hardness)
-                {
-                    // replace with air cell
-                    ReplaceCellAtLocation(x, y, new Air(x, y));
-                    Console.Clear();
-                    printgrid();
-                    // every tick must call again to dig untill it is done 
-                }
-
-            }
-            else
-            {
-               throw new InvalidOperationException("Cell is not dirt");
-            }
-
-
-        }
+        
         public void CreateFoodStore(int x, int y)
         {
             if (!grid.IsInGridRange(x, y))
