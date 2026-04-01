@@ -1,11 +1,24 @@
 ﻿<Window x:Class="AntFarm.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="AntFarm" Height="450" Width="760">
+        Title="AntFarm" Height="550" Width="929">
+    <Window.Resources>
+        <Style x:Key="LinkButton" TargetType="Button">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <ContentPresenter/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
-            <RowDefinition Height="90" />
+            <RowDefinition Height="110" />
         </Grid.RowDefinitions>
         <Border Grid.Row="0" BorderBrush="Black" BorderThickness="2" Margin="5,5,5,0">
             <Canvas x:Name="MainCanvas" Background="White" />
@@ -25,13 +38,13 @@
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
                     <Border Grid.Row="0" BorderBrush="Black" BorderThickness="0,0,1,1">
-                        <TextBlock x:Name="createNdestroybut" Text="Create and destroy" VerticalAlignment="Center" Margin="6,0" FontSize="11"/>
+                        <Button x:Name="createNdestroybut" Content="Create and destroy" VerticalAlignment="Center" Margin="6,0" FontSize="11" Style="{StaticResource LinkButton}" Click="createNdestroybut_Click"/>
                     </Border>
                     <Border Grid.Row="1" BorderBrush="Black" BorderThickness="0,0,1,1">
-                        <TextBlock Text="Settings" VerticalAlignment="Bottom" Margin="6,0,6,6" FontSize="11"/>
+                        <Button Content="Settings" VerticalAlignment="Bottom" Margin="6,0,6,6" FontSize="11" Style="{StaticResource LinkButton}" Click="SettingsBut_click"/>
                     </Border>
                     <Border Grid.Row="2" BorderBrush="Black" BorderThickness="0,0,1,0">
-                        <TextBlock Text="Dev tools" VerticalAlignment="Center" Margin="6,0" FontSize="11"/>
+                        <Button Content="Dev tools" VerticalAlignment="Center" Margin="6,0" FontSize="11" Style="{StaticResource LinkButton}" Click="Dev_tools_But_Click"/>
                     </Border>
                 </Grid>
                 <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,1,0">
@@ -43,10 +56,34 @@
                         <Border Grid.Row="0" Background="#EEEEEE" BorderBrush="Black" BorderThickness="0,0,0,1">
                             <TextBlock Text="Actions" FontSize="10" FontWeight="Bold" Padding="4,1"/>
                         </Border>
-                        <StackPanel Grid.Row="1" x:Name="ActionsPanel" Orientation="Vertical" Margin="4,2">
-                            <TextBlock x:Name="Action1" Text="— select an option —"
-                                       FontSize="10" Foreground="#666666"
-                                       FontStyle="Italic" Margin="0,1"/>
+                        
+                        <!-- Reverted back to StackPanel as requested -->
+                        <StackPanel x:Name="ActionsContainer" Grid.Row="1">
+
+                            <!-- Create and Destroy options -->
+                            <StackPanel x:Name="PanelCreateDestroy" Visibility="Collapsed">
+                                <Button Content="Build Farm" Click="BuildFarm_Click" Background="White"/>
+                                <Button Content="Build Food Store" Click="BuildFoodStore_Click" Background="White"/>
+                                <Button Content="Dig" Click="Dig_Click" Background="White"/>
+                                <Button Content="Remove Building" Click="RemoveBuilding_Click" Background="White"/>
+                            </StackPanel>
+
+                            <!-- Settings options -->
+                            <StackPanel x:Name="PanelSettings" Visibility="Collapsed">
+                                <Button Content="Ideal Population" Click="IdealPop_Click" Background="White"/>
+                                <Button Content="Exit Game" Click="ExitGame_Click" Background="White"/>
+                                <Button Content="Save Game" Click="SaveGame_Click" Background="White"/>
+                                <Button Content="Get Statistics" Click="GetStats_Click" Background="White"/>
+                            </StackPanel>
+
+                            <!-- Dev Tools options -->
+                            <StackPanel x:Name="PanelDevTools" Visibility="Collapsed">
+                                <Button Content="Spawn Entity" Click="SpawnEntity_Click" Background="White"/>
+                                <Button Content="Remove Area" Click="RemoveArea_Click" Background="White"/>
+                                <Button Content="Get Cell Details" Click="GetCellDetails_Click" Background="White"/>
+                                <Button Content="Edit Entity Details" Click="EditEntity_Click" Background="White"/>
+                            </StackPanel>
+
                         </StackPanel>
                     </Grid>
                 </Border>

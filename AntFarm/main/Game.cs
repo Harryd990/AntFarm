@@ -15,7 +15,7 @@ namespace AntFarm.main
     /*
      * to do:
      * need to add speed stuff (game.step) 
-     * add starting menu so when player loads in they set the grid size and stuff PERMINANTLY 
+     * 
      * add saving and loading of game state 
      * canceling inputs
      * 
