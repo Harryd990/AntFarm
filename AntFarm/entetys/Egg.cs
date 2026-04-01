@@ -23,6 +23,7 @@ namespace AntFarm.entetys
             game.AddEntityToGameGrid(x, y, worker);
             game.lastEntityId++;
             game.workercount++;
+            game.totalAntsEver++;
         }
 
 

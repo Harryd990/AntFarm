@@ -90,9 +90,76 @@ namespace AntFarm.main
         public int lastEntityId { get; set; } = 0;
         public int QueenFoodCount => queen?.food ?? 0;
 
+
+
+
+        public int totalAntsEver { get; set; } = 0;
+        public int totalFoodConsumed { get; set; } = 0;
+        public int totalDigsDone { get; set; } = 0;
+        public int totalBuildingsMade { get; set; } = 0;
+
+
+
+
+
+
         public (int,int) getGridDims()
         {
             return (grid.width, grid.height);
+        }
+        public List<string> statistics()
+        {
+            /*
+             * Statistics 
+                        Number of ants currently 
+                        Number of ants ever 
+                        current ant average age
+                        Number of food consumed 
+                        Number of food in stores 
+                        number of buildings made
+                        number of digs done 
+             */
+
+
+            List<string> statistics = new List<string> { };
+
+            statistics.Add($"Current Ant Count: {GetAllAnts().Count}");
+
+            statistics.Add($"Total Ants Ever: {totalAntsEver}");
+
+            int sigmage = 0;
+            foreach (var ant in GetAllAnts())
+            {
+                sigmage += ant.age;
+            }
+            int averageage = GetAllAnts().Count > 0 ? sigmage / GetAllAnts().Count : 0;
+
+            statistics.Add($"Current Ant Average Age: {averageage}");
+            statistics.Add($"Total Food Consumed: {totalFoodConsumed}");
+
+
+            int sumFoodInStores = 0;
+            for (int x = 0; x < grid.width; x++)
+            {
+                for (int y = 0; y < grid.height; y++)
+                {
+                    var cell = grid.GetCellAtLocation(x, y);
+                    var foodStores = cell.Entities.OfType<FoodStore>().ToList();
+                    foreach (var store in foodStores)
+                    {
+                        sumFoodInStores += store.foodcontained;
+                    }
+                }
+            }
+            statistics.Add($"Total Food in Stores: {sumFoodInStores}");
+
+            statistics.Add($"Total Buildings Made: {totalBuildingsMade}");
+
+            statistics.Add($"Total Digs Done: {totalDigsDone}");
+
+
+
+            return statistics;
         }
 
         public void Initialise_Game()
@@ -101,6 +168,7 @@ namespace AntFarm.main
             Random rand = new Random();
             queen = new Queen(0, 'Q');
             AddEntityToGameGrid(grid.width / 2, grid.height / 4 - 1, queen);
+            totalAntsEver++;
 
             for (int i = 2; i <= startingAntCount; i++)
             {
@@ -118,6 +186,7 @@ namespace AntFarm.main
                 
                 lastEntityId++;
                 workercount++;
+                totalAntsEver++;
 
 
             }
@@ -210,6 +279,7 @@ namespace AntFarm.main
                 {
                     // replace with air cell
                     ReplaceCellAtLocation(x, y, new Air(x, y));
+                    totalDigsDone++;
                     // Removed Console.Clear() and printgrid() to prevent crashes in WPF
                 }
             }
@@ -681,11 +751,13 @@ namespace AntFarm.main
                                     ant.food += foodEntity.currentAmount;
                                     foodEntity.currentAmount = 0;
                                     foodCell.RemoveEntity(foodEntity);
+                                    totalFoodConsumed += foodEntity.currentAmount;
                                 }
                                 else
                                 {
                                     ant.food += foodNeeded;
                                     foodEntity.currentAmount -= foodNeeded;
+                                    totalFoodConsumed += foodNeeded;
                                 }
                             }
                         }
@@ -998,6 +1070,7 @@ namespace AntFarm.main
                     {
                         var buildCell = grid.GetCellAtLocation(tx, ty);
                         if (buildCell.IsTraversable) CreateFarm(tx, ty);
+                        totalBuildingsMade++;
                     }
                     catch { }
 
@@ -1023,6 +1096,7 @@ namespace AntFarm.main
                     {
                         var buildCell = grid.GetCellAtLocation(tx, ty);
                         if (buildCell.IsTraversable) CreateFoodStore(tx, ty);
+                        totalBuildingsMade++;
                     }
                     catch { }
 
@@ -1234,6 +1308,7 @@ namespace AntFarm.main
             List<Ant> ants = GetAllAnts();
             foreach (var ant in ants)
             {
+                ant.age++;
                 ant.food--;
                 if (ant.food <= 0)
                 {
@@ -1241,7 +1316,17 @@ namespace AntFarm.main
                     var pos = ant.Position;
                     var cell = grid.GetCellAtLocation(pos.Item1, pos.Item2);
                     cell.RemoveEntity(ant);
+                    workercount--;
                     OnSimulationLog?.Invoke($"An ant has died of hunger at ({pos.Item1},{pos.Item2})");
+                }
+                if (ant.age >= 1000)
+                {
+                    // remove ant from grid
+                    var pos = ant.Position;
+                    var cell = grid.GetCellAtLocation(pos.Item1, pos.Item2);
+                    cell.RemoveEntity(ant);
+                    workercount--;
+                    OnSimulationLog?.Invoke($"An ant has died of old age at ({pos.Item1},{pos.Item2})");
                 }
             }
             

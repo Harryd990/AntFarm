@@ -105,7 +105,20 @@ namespace AntFarm
             this.Close();
         }
         private void SaveGame_Click(object sender, RoutedEventArgs e) { }
-        private void GetStats_Click(object sender, RoutedEventArgs e) { }
+        
+        private void GetStats_Click(object sender, RoutedEventArgs e) 
+        {
+            if (_game == null) return;
+
+            // Get the list of strings from your Game.statistics() method
+            var statsList = _game.statistics();
+
+            // Join them together with line breaks
+            string statsMsg = string.Join("\n", statsList);
+
+            // Pop up the message box
+            MessageBox.Show(statsMsg, "Current Game Statistics", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
 
         // Dev Tools
         private void SpawnEntity_Click(object sender, RoutedEventArgs e) { }

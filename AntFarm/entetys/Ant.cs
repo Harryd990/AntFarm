@@ -27,6 +27,8 @@ namespace AntFarm.entetys
         public virtual int food { get; set; } = 20;
         public virtual int maxfood { get; set; } = 100;
 
+        public virtual int age { get; set; } = 0;
+
         public virtual int carryingcapacity { get; set; } = 1000;
         public virtual int foodcarried { get; set; } = 0;
         /*
