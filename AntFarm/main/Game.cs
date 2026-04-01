@@ -48,7 +48,7 @@ namespace AntFarm.main
      * - edit entity details (eg change food amount in food store or food source or change ant food or age or something)
      * 
      * possible bugs
-     * - queen promotaion might not be working
+     * - 
      * - the farmwork task is being called multiple times 
      * - ants maight not being assigned wander tasks enough
      * - when innitalising with sliders you can add more ants then there is space in grid
@@ -237,7 +237,7 @@ namespace AntFarm.main
         public void UpdateTick()
         {
             HungerAnts();
-            PrintAllTasksInQueue(); // Console.WriteLines are fine, they will go to the Output window
+            
             UgentHungerCheck();
 
             ProcessAntMovementAndTasks();
@@ -265,7 +265,7 @@ namespace AntFarm.main
                 }
             }
 
-            tick++; // Don't forget to increment your tick counter
+            tick++; 
         }
 
         public void dig(int x, int y)
@@ -312,24 +312,48 @@ namespace AntFarm.main
 
         public void QueenPromotionCheck()
         {
-            if (queen == null)
+            var ants = GetAllAnts();
+            var aliveQueen = ants.OfType<Queen>().FirstOrDefault();
+
+            if (aliveQueen == null)
             {
-                var ants = GetAllAnts();
-                var newQueen = ants.OfType<Worker>().FirstOrDefault();
-                if (newQueen != null)
+                var newQueenWorker = ants.OfType<Worker>().FirstOrDefault(w => w.food > 50);
+                if (newQueenWorker != null)
                 {
-                    // need to fix this as its not fully replacing the worker with the queen and is causing issues with the grid and get cell info and stuff
-                    queen = new Queen(newQueen.Id, 'Q');
-                    var cell = grid.GetCellAtLocation(newQueen.Position.Item1, newQueen.Position.Item2);
-                    cell.RemoveEntity(newQueen);
+                    // Create Queen and retain all worker attributes
+                    queen = new Queen(newQueenWorker.Id, 'Q');
+                    queen.Position = newQueenWorker.Position;
+                    queen.age = newQueenWorker.age;
+                    queen.food = newQueenWorker.food - 20;
+
+                    queen.foodcarried = newQueenWorker.foodcarried;
+                    queen.maxfood = newQueenWorker.maxfood;
+                    queen.carryingcapacity = newQueenWorker.carryingcapacity;
+                    queen.Currenttask = newQueenWorker.Currenttask;
+                    queen.clamedtaskid = newQueenWorker.clamedtaskid;
+                    queen.path = newQueenWorker.path;
+                    queen.FoodStoreTarget = newQueenWorker.FoodStoreTarget;
+                    queen.FillingFromSource = newQueenWorker.FillingFromSource;
+
+                    // Fully replace in the grid so UI rendering picks up the new type
+                    var cell = grid.GetCellAtLocation(newQueenWorker.Position.Item1, newQueenWorker.Position.Item2);
+                    cell.RemoveEntity(newQueenWorker);
                     cell.AddEntity(queen);
-                    Console.WriteLine($"A new queen has been promoted at ({newQueen.Position.Item1},{newQueen.Position.Item2})");
+
+                    Console.WriteLine($"A new queen has been promoted at ({newQueenWorker.Position.Item1},{newQueenWorker.Position.Item2})");
+                }
+                else
+                {
+                    queen = null;
                 }
             }
-            
-            
+            else
+            {
+                // Make sure reference holds if a queen is alive
+                queen = aliveQueen;
+            }
         }
-        
+
         private void UnassignTaskAndReleaseFarm(Ant ant)
         {
             if (ant == null) return;
@@ -360,8 +384,7 @@ namespace AntFarm.main
             Check4EmptyStores();
             UpdateFarms();
             QueenPromotionCheck();
-            //QueenPromotionCheck();
-            // check if there is a food store that isnt full if so add a food store fill task to quue
+            
         }
         public void UpdateFarms()
         {

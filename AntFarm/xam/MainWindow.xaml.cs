@@ -252,8 +252,8 @@ namespace AntFarm
                 Point clickPos = e.GetPosition(MainCanvas);
                 
                 // Unhook events
-                MainCanvas.MouseLeftButtonDown -= clickHandler;
-                MainCanvas.MouseRightButtonDown -= rightClickHandler;
+                MainCanvas.PreviewMouseLeftButtonDown -= clickHandler;
+                MainCanvas.PreviewMouseRightButtonDown -= rightClickHandler;
 
                 // Remove the red border
                 if (adornerLayer != null && redBorder != null) adornerLayer.Remove(redBorder);
@@ -262,8 +262,8 @@ namespace AntFarm
                 double cellWidth = MainCanvas.ActualWidth / cols;
                 double cellHeight = MainCanvas.ActualHeight / rows;
 
-                int gridX = (int)(clickPos.X / cellWidth);
-                int gridY = (int)(clickPos.Y / cellHeight);
+                int gridX = (int)Math.Floor(clickPos.X / cellWidth);
+                int gridY = (int)Math.Floor(clickPos.Y / cellHeight);
 
                 gridX = Math.Max(0, Math.Min(cols - 1, gridX));
                 gridY = Math.Max(0, Math.Min(rows - 1, gridY));
@@ -276,8 +276,8 @@ namespace AntFarm
             rightClickHandler = (s, e) =>
             {
                 // Unhook events
-                MainCanvas.MouseLeftButtonDown -= clickHandler;
-                MainCanvas.MouseRightButtonDown -= rightClickHandler;
+                MainCanvas.PreviewMouseLeftButtonDown -= clickHandler;
+                MainCanvas.PreviewMouseRightButtonDown -= rightClickHandler;
                 
                 // Remove the red border
                 if (adornerLayer != null && redBorder != null) adornerLayer.Remove(redBorder);
@@ -287,9 +287,9 @@ namespace AntFarm
                 frame.Continue = false;
             };
 
-            // Hook them up
-            MainCanvas.MouseLeftButtonDown += clickHandler;
-            MainCanvas.MouseRightButtonDown += rightClickHandler;
+            // Hook them up to "Preview" (Tunneling) events so high tick speed rendering clears don't steal the event
+            MainCanvas.PreviewMouseLeftButtonDown += clickHandler;
+            MainCanvas.PreviewMouseRightButtonDown += rightClickHandler;
 
             // This freezes execution of this method without crashing the UI window entirely
             Dispatcher.PushFrame(frame);
