@@ -96,7 +96,48 @@ namespace AntFarm
         private void RemoveBuilding_Click(object sender, RoutedEventArgs e) { }
 
         // Settings
-        private void IdealPop_Click(object sender, RoutedEventArgs e) { }
+        private void IdealPop_Click(object sender, RoutedEventArgs e) 
+        {
+            if (_game == null) return;
+
+            // Create a small custom popup window in code
+            Window inputWindow = new Window
+            {
+                Title = "Ideal Population",
+                Width = 300,
+                Height = 150,
+                WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                Owner = this,
+                ResizeMode = ResizeMode.NoResize
+            };
+
+            StackPanel panel = new StackPanel { Margin = new Thickness(15) };
+            panel.Children.Add(new TextBlock { Text = "Enter the new ideal population number:", Margin = new Thickness(0,0,0,10) });
+            
+            // Pre-fill with the current value
+            TextBox textBox = new TextBox { Text = _game.IdealPopulation.ToString(), Padding = new Thickness(2) };
+            panel.Children.Add(textBox);
+
+            Button submitBtn = new Button { Content = "Save", Width = 80, Margin = new Thickness(0, 15, 0, 0), HorizontalAlignment = HorizontalAlignment.Right };
+            submitBtn.Click += (s, args) => 
+            {
+                if (int.TryParse(textBox.Text, out int result) && result >= 0)
+                {
+                    _game.IdealPopulation = result;
+                    
+                    inputWindow.Close();
+                }
+                else
+                {
+                    MessageBox.Show("Please enter a valid positive number.", "Invalid Input", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+            };
+            panel.Children.Add(submitBtn);
+
+            inputWindow.Content = panel;
+            inputWindow.ShowDialog();
+        }
+
         private void NewGame_Click(object sender, RoutedEventArgs e)
         {
             

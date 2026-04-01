@@ -80,15 +80,13 @@ namespace AntFarm.main
          
         int StartingFodCount { get; set; }
         int startingAntCount { get; set; }
-
-
-
         public int workercount { get; set; } = 0;
         public int GridWidth => grid.width;
         public int GridHeight => grid.height;
         public int tick { get; set; } = 0;
         public int lastEntityId { get; set; } = 0;
         public int QueenFoodCount => queen?.food ?? 0;
+        public int IdealPopulation { get; set; } = 100;
 
 
 
@@ -247,7 +245,7 @@ namespace AntFarm.main
 
             if (checkforUnderGroundSpace() && queen.retreting == false)
             {
-                if (queen != null && queen.food >= 60 && queen.EggGracePeriod <= 0)
+                if (queen != null && queen.food >= 60 && queen.EggGracePeriod <= 0 && IdealPopulation > GetAllAnts().Count())
                 {
                     algorithm.Task queenTask = new algorithm.Task(queue1.lasttaskid++, "queenretrete", queen.Position);
                     if (queen.clamedtaskid == -1 || queen.Currenttask.tasktype == "wander")
