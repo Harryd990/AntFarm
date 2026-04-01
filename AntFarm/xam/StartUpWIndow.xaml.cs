@@ -35,7 +35,7 @@ namespace AntFarm
 
             if (isValid)
             {
-                MainWindow mainWindow = new MainWindow();
+                MainWindow mainWindow = new MainWindow(newgame);
                 mainWindow.Show();
                 this.Close();
             }

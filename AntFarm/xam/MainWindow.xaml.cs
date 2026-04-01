@@ -1,21 +1,22 @@
-﻿using System.Text;
+﻿using AntFarm.handelers;
+using AntFarm.main;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace AntFarm
 {
     public partial class MainWindow : Window
     {
-        public MainWindow()
+        private Game _game;
+
+        public MainWindow(Game game)
         {
             InitializeComponent();
+            _game = game;
+
+            // Render the grid onto the MainCanvas once it's loaded and whenever it resizes
+            MainCanvas.Loaded += (s, e) => GridRenderer.Render(_game, MainCanvas);
+            MainCanvas.SizeChanged += (s, e) => GridRenderer.Render(_game, MainCanvas);
         }
 
         private void createNdestroybut_Click(object sender, RoutedEventArgs e)
@@ -41,6 +42,7 @@ namespace AntFarm
 
             panelToShow.Visibility = Visibility.Visible;
         }
+
         // Create and Destroy
         private void BuildFarm_Click(object sender, RoutedEventArgs e) { }
         private void BuildFoodStore_Click(object sender, RoutedEventArgs e) { }
@@ -58,6 +60,5 @@ namespace AntFarm
         private void RemoveArea_Click(object sender, RoutedEventArgs e) { }
         private void GetCellDetails_Click(object sender, RoutedEventArgs e) { }
         private void EditEntity_Click(object sender, RoutedEventArgs e) { }
-
-    }  
-}     
+    }
+}

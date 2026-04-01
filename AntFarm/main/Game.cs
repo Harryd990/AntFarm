@@ -53,7 +53,7 @@ namespace AntFarm.main
 
     public class Game
     {
-        private Grid grid;
+        public Grid grid;
         private Queen queen;
         public queue queue1 = new queue();
 

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace AntFarm
 {
-    internal class Grid
+    public class Grid
     {
         Random random = new Random();
 
