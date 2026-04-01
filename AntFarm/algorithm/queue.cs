@@ -46,18 +46,48 @@ namespace AntFarm.algorithm
 
             if (tasks.Count > 0)
             {
-                Task nexttask = tasks[0];
-                tasks.RemoveAt(0);
-                return nexttask;
+                // Look for the first task that is reachable
+                for (int i = 0; i < tasks.Count; i++)
+                {
+                    Task t = tasks[i];
+
+                    // If it's a dig command, ensure there is at least one adjacent traversable cell to stand on
+                    if (string.Equals(t.tasktype, "dig", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var (tx, ty) = t.targetposition;
+                        bool isReachable = false;
+                        
+                        (int dx, int dy)[] dirs = { (1, 0), (-1, 0), (0, 1), (0, -1) };
+                        foreach (var d in dirs)
+                        {
+                            
+                            int nx = tx + d.dx; 
+                            int ny = ty + d.dy;
+                            
+                            if (game.grid.IsInGridRange(nx, ny) && game.grid.GetCellAtLocation(nx, ny).IsTraversable)
+                            {
+                                isReachable = true;
+                                break;
+                            }
+                        }
+
+                        // If all surrounding cells are solid dirt/stone, skip this task. 
+                        // It will remain in the queue until an adjacent block is dug out.
+                        if (!isReachable) continue; 
+                    }
+
+                    // Found a valid/reachable task! Remove and dispatch it.
+                    tasks.RemoveAt(i);
+                    return t;
+                }
             }
-            else
-            {
-                Random rand = new Random();
-                int x = rand.Next(game.GridWidth);
-                int y = rand.Next(0, game.GridHeight / 4);
-                algorithm.Task wander = new algorithm.Task(lasttaskid++, "wander", (x, y));
-                return wander;
-            }
+
+            // Fall back to wandering if there are no tasks, or if all tasks are currently unreachable
+            Random rand = new Random();
+            int x = rand.Next(game.GridWidth);
+            int y = rand.Next(0, game.GridHeight / 4);
+            algorithm.Task wander = new algorithm.Task(lasttaskid++, "wander", (x, y));
+            return wander;
         }
         
     }

@@ -52,6 +52,7 @@ namespace AntFarm.main
      * - the farmwork task is being called multiple times 
      * - ants maight not being assigned wander tasks enough
      * - when innitalising with sliders you can add more ants then there is space in grid
+     * - air is somethings going green when undergound on smaller / none whole grid sizes
      *  
      * 
      * 
@@ -86,7 +87,7 @@ namespace AntFarm.main
         public int tick { get; set; } = 0;
         public int lastEntityId { get; set; } = 0;
         public int QueenFoodCount => queen?.food ?? 0;
-        public int IdealPopulation { get; set; } = 100;
+        public int IdealPopulation { get; set; } = 10;
 
 
 

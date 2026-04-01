@@ -36,11 +36,31 @@ namespace AntFarm.handelers
             double cellWidth = canvas.ActualWidth / cols;
             double cellHeight = canvas.ActualHeight / rows;
 
-            // Pre-calculate all dig orders to find them efficiently
-            var digOrders = game.queue1.tasks
+            // Pre-calculate all dig orders to find them efficiently:
+            // 1. From pending tasks in the queue
+            var queuedDigs = game.queue1.tasks
                 .Where(t => string.Equals(t.tasktype, "dig", StringComparison.OrdinalIgnoreCase))
-                .Select(t => t.targetposition)
-                .ToHashSet();
+                .Select(t => t.targetposition);
+
+            // 2. From assigned tasks currently being worked by ants
+            var assignedDigs = new List<(int, int)>();
+            for (int x = 0; x < cols; x++)
+            {
+                for (int y = 0; y < rows; y++)
+                {
+                    var cell = game.grid.GetCellAtLocation(x, y);
+                    foreach (var e in cell.Entities)
+                    {
+                        if (e is Ant ant && ant.Currenttask != null && string.Equals(ant.Currenttask.tasktype, "dig", StringComparison.OrdinalIgnoreCase))
+                        {
+                            assignedDigs.Add(ant.Currenttask.targetposition);
+                        }
+                    }
+                }
+            }
+
+            // Combine both into a single fast lookup set
+            var digOrders = queuedDigs.Concat(assignedDigs).ToHashSet();
 
             // PHASE 1: Draw all base grid cells first (guarantees they stay in the background)
             for (int x = 0; x < cols; x++)
@@ -106,23 +126,31 @@ namespace AntFarm.handelers
                     // Draw Dig Orders (Red "X")
                     if (digOrders.Contains((x, y)))
                     {
+                        // Use a brighter red and thicker stroke
+                        Brush vibrantRed = new SolidColorBrush(Color.FromRgb(255, 0, 0));
+                        double markerThickness = Math.Max(3, cellWidth * 0.1);
+
                         Line line1 = new Line
                         {
-                            Stroke = Brushes.Red,
-                            StrokeThickness = 2,
-                            X1 = xPos,
-                            Y1 = yPos,
-                            X2 = xPos + cellWidth,
-                            Y2 = yPos + cellHeight
+                            Stroke = vibrantRed,
+                            StrokeThickness = markerThickness,
+                            X1 = xPos + cellWidth * 0.1,
+                            Y1 = yPos + cellHeight * 0.1,
+                            X2 = xPos + cellWidth * 0.9,
+                            Y2 = yPos + cellHeight * 0.9,
+                            StrokeEndLineCap = PenLineCap.Round,
+                            StrokeStartLineCap = PenLineCap.Round
                         };
                         Line line2 = new Line
                         {
-                            Stroke = Brushes.Red,
-                            StrokeThickness = 2,
-                            X1 = xPos + cellWidth,
-                            Y1 = yPos,
-                            X2 = xPos,
-                            Y2 = yPos + cellHeight
+                            Stroke = vibrantRed,
+                            StrokeThickness = markerThickness,
+                            X1 = xPos + cellWidth * 0.9,
+                            Y1 = yPos + cellHeight * 0.1,
+                            X2 = xPos + cellWidth * 0.1,
+                            Y2 = yPos + cellHeight * 0.9,
+                            StrokeEndLineCap = PenLineCap.Round,
+                            StrokeStartLineCap = PenLineCap.Round
                         };
                         canvas.Children.Add(line1);
                         canvas.Children.Add(line2);
@@ -195,6 +223,8 @@ namespace AntFarm.handelers
                     Polygon hexagon = new Polygon
                     {
                         Fill = fillColor,
+                        Stroke = Brushes.Black,
+                        StrokeThickness = 0.5,
                         Points = new PointCollection
                         {
                             new Point(xPos + cellWidth * 0.5, yPos + cellHeight * 0.1),  // Top Center
@@ -228,19 +258,20 @@ namespace AntFarm.handelers
             }
             else if (e is Egg)
             {
-                double eggSize = cellWidth * 0.4;
+                // Scaled down to 0.25 and perfectly centered
+                double eggSize = cellWidth * 0.25;
                 
-                Ellipse e1 = new Ellipse { Width = eggSize, Height = eggSize, Fill = Brushes.White };
-                Canvas.SetLeft(e1, xPos + (cellWidth * 0.15));
-                Canvas.SetTop(e1, yPos + (cellHeight * 0.5));
+                Ellipse e1 = new Ellipse { Width = eggSize, Height = eggSize, Fill = Brushes.White, Stroke = Brushes.Black, StrokeThickness = 0.5 };
+                Canvas.SetLeft(e1, xPos + (cellWidth * 0.225));
+                Canvas.SetTop(e1, yPos + (cellHeight * 0.425)); 
                 
-                Ellipse e2 = new Ellipse { Width = eggSize, Height = eggSize, Fill = Brushes.White };
-                Canvas.SetLeft(e2, xPos + (cellWidth * 0.55));
-                Canvas.SetTop(e2, yPos + (cellHeight * 0.5));
+                Ellipse e2 = new Ellipse { Width = eggSize, Height = eggSize, Fill = Brushes.White, Stroke = Brushes.Black, StrokeThickness = 0.5 };
+                Canvas.SetLeft(e2, xPos + (cellWidth * 0.525));
+                Canvas.SetTop(e2, yPos + (cellHeight * 0.425)); 
 
-                Ellipse e3 = new Ellipse { Width = eggSize, Height = eggSize, Fill = Brushes.White };
-                Canvas.SetLeft(e3, xPos + (cellWidth * 0.35));
-                Canvas.SetTop(e3, yPos + (cellHeight * 0.2));
+                Ellipse e3 = new Ellipse { Width = eggSize, Height = eggSize, Fill = Brushes.White, Stroke = Brushes.Black, StrokeThickness = 0.5 };
+                Canvas.SetLeft(e3, xPos + (cellWidth * 0.375));
+                Canvas.SetTop(e3, yPos + (cellHeight * 0.225)); 
 
                 canvas.Children.Add(e1);
                 canvas.Children.Add(e2);
@@ -248,7 +279,7 @@ namespace AntFarm.handelers
             }
             else if (e is Ant)
             {
-                Brush entityBrush = e is Queen ? Brushes.Yellow : Brushes.DarkGray; // Changed from LightGray to DarkGray
+                Brush entityBrush = e is Queen ? Brushes.Yellow : Brushes.DarkGray; 
                 
                 Ellipse antCircle = new Ellipse
                 {

@@ -92,7 +92,40 @@ namespace AntFarm
         // Create and Destroy
         private void BuildFarm_Click(object sender, RoutedEventArgs e) { }
         private void BuildFoodStore_Click(object sender, RoutedEventArgs e) { }
-        private void Dig_Click(object sender, RoutedEventArgs e) { }
+        
+         private void Dig_Click(object sender, RoutedEventArgs e)
+        {
+           
+            while (true)
+            {
+                var (gridX, gridY) = canvasCellSelect();
+                
+                // If the user right-clicked, the result is (-1, -1), so we break out of the loop
+                if (gridX == -1 || gridY == -1) 
+                {
+                    UpdatesText.Text += "\n- Exited Dig Tool";
+                    break;
+                }
+
+                string typeName = _game.GetCellType(gridX, gridY);
+                
+                // Allow both Dirt and stone
+                if (typeName == "Dirt" || typeName.Equals("stone", StringComparison.OrdinalIgnoreCase)) 
+                {
+                    AntFarm.algorithm.Task digtask = new AntFarm.algorithm.Task(_game.queue1.lasttaskid++, "dig", (gridX, gridY));
+                    _game.queue1.addtask(digtask);
+                    UpdatesText.Text += $"\n- Queued dig task at ({gridX}, {gridY})";
+                    
+                    // Ensure visual update right away
+                    GridRenderer.Render(_game, MainCanvas);
+                }
+                else
+                {
+                    MessageBox.Show("You can only dig through dirt or stone cells.", "Invalid Target", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }   
+            }
+        }
+        
         private void RemoveBuilding_Click(object sender, RoutedEventArgs e) { }
 
         // Settings
@@ -169,8 +202,117 @@ namespace AntFarm
 
         private void OnGameLogMessage(string message)
         {
+            // Create the specific log line we want to append
+            string logLine = $"\n- {message}";
+            UpdatesText.Text += logLine;
+
+            // Scroll to the bottom to make sure the user sees the death notification
+            if (UpdatesText.Parent is ScrollViewer scrollViewer)
+            {
+                scrollViewer.ScrollToBottom();
+            }
+
+            // Start a fire-and-forget background task to remove this specific line after 5 seconds
+            System.Threading.Tasks.Task.Run(async () =>
+            {
+                await System.Threading.Tasks.Task.Delay(5000);
+
+                // We must use Dispatcher.Invoke because we are touching UI elements from a background thread!
+                Dispatcher.Invoke(() =>
+                {
+                    // Find and remove the first occurrence of this exact log line
+                    int index = UpdatesText.Text.IndexOf(logLine);
+                    if (index >= 0)
+                    {
+                        UpdatesText.Text = UpdatesText.Text.Remove(index, logLine.Length);
+                    }
+                });
+            });
+        }
+        public (int, int) canvasCellSelect()
+        {
+            var frame = new DispatcherFrame();
+            (int x, int y) result = (-1, -1);
+
+            System.Windows.Input.MouseButtonEventHandler clickHandler = null;
+            System.Windows.Input.MouseButtonEventHandler rightClickHandler = null;
             
-            UpdatesText.Text += $"\n- {message}";
+            // Add a red border using a WPF Adorner so the GridRenderer clearing the canvas doesn't wipe it
+            System.Windows.Documents.AdornerLayer adornerLayer = System.Windows.Documents.AdornerLayer.GetAdornerLayer(MainCanvas);
+            CanvasBorderAdorner redBorder = null;
+            if (adornerLayer != null)
+            {
+                redBorder = new CanvasBorderAdorner(MainCanvas);
+                adornerLayer.Add(redBorder);
+            }
+
+            // Define the logic when a left-click happens
+            clickHandler = (s, e) =>
+            {
+                Point clickPos = e.GetPosition(MainCanvas);
+                
+                // Unhook events
+                MainCanvas.MouseLeftButtonDown -= clickHandler;
+                MainCanvas.MouseRightButtonDown -= rightClickHandler;
+
+                // Remove the red border
+                if (adornerLayer != null && redBorder != null) adornerLayer.Remove(redBorder);
+
+                var (cols, rows) = _game.getGridDims();
+                double cellWidth = MainCanvas.ActualWidth / cols;
+                double cellHeight = MainCanvas.ActualHeight / rows;
+
+                int gridX = (int)(clickPos.X / cellWidth);
+                int gridY = (int)(clickPos.Y / cellHeight);
+
+                gridX = Math.Max(0, Math.Min(cols - 1, gridX));
+                gridY = Math.Max(0, Math.Min(rows - 1, gridY));
+
+                result = (gridX, gridY);
+                frame.Continue = false;
+            };
+
+            // Define the logic when right-click happens to cancel
+            rightClickHandler = (s, e) =>
+            {
+                // Unhook events
+                MainCanvas.MouseLeftButtonDown -= clickHandler;
+                MainCanvas.MouseRightButtonDown -= rightClickHandler;
+                
+                // Remove the red border
+                if (adornerLayer != null && redBorder != null) adornerLayer.Remove(redBorder);
+                
+                // Leave result as (-1, -1) to signify canceled action
+                result = (-1, -1);
+                frame.Continue = false;
+            };
+
+            // Hook them up
+            MainCanvas.MouseLeftButtonDown += clickHandler;
+            MainCanvas.MouseRightButtonDown += rightClickHandler;
+
+            // This freezes execution of this method without crashing the UI window entirely
+            Dispatcher.PushFrame(frame);
+
+            return result;
+        }
+    }
+
+    // Helper class to draw a border over the Canvas independently of cell children
+    public class CanvasBorderAdorner : System.Windows.Documents.Adorner
+    {
+        public CanvasBorderAdorner(UIElement adornedElement) : base(adornedElement) { }
+
+        protected override void OnRender(System.Windows.Media.DrawingContext drawingContext)
+        {
+            Rect adornedElementRect = new Rect(this.AdornedElement.RenderSize);
+
+            // Convert the hex string into a SolidColorBrush
+            var customColor = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#FF5D40");
+            var customBrush = new System.Windows.Media.SolidColorBrush(customColor);
+
+            System.Windows.Media.Pen renderPen = new System.Windows.Media.Pen(customBrush, 6);
+            drawingContext.DrawRectangle(null, renderPen, adornedElementRect);
         }
     }
 }
