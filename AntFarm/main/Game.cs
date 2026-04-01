@@ -61,9 +61,10 @@ namespace AntFarm.main
         {
             grid = new Grid(width, height);
             queue1 = new queue();
-            int StartingFodCount = startfood;
-            int startingAntCount = startants;
-
+            
+            // Remove the 'int' keyword here so it assigns to the class properties
+            StartingFodCount = startfood;
+            startingAntCount = startants;
         }
          
         int StartingFodCount { get; set; }
@@ -90,7 +91,7 @@ namespace AntFarm.main
             queen = new Queen(0, 'Q');
             AddEntityToGameGrid(grid.width / 2, grid.height / 4 - 1, queen);
 
-            for (int i = 1; i <= startingAntCount; i++)
+            for (int i = 2; i <= startingAntCount; i++)
             {
                 // adds 4 workers along the first line of air
                 Entity Worker = new Worker(i, 'A'); 
@@ -160,14 +161,14 @@ namespace AntFarm.main
             bool running = true;
             //Thread.Sleep(20); 
 
-            grid.PrintGrid();
+            //grid.PrintGrid();
             while (running)
             {
                 HungerAnts();
                 PrintAllTasksInQueue();
                 UgentHungerCheck();
 
-                inputselector();
+                //inputselector();
                 ProcessAntMovementAndTasks();
                 
                 GeneralTickUpdates();
