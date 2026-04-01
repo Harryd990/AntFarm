@@ -54,8 +54,8 @@ namespace AntFarm
             }
             else
             {
-                // Inversely proportional: slider value 1 = 1000ms, value 5 = 200ms
-                double intervalMs = 1000.0 / SpeedSlider.Value;
+                // Inversely proportional but doubled speed: slider value 1 = 500ms, value 5 = 100ms
+                double intervalMs = 100 / SpeedSlider.Value;
                 _simTimer.Interval = TimeSpan.FromMilliseconds(intervalMs);
                 
                 if (!_simTimer.IsEnabled)
@@ -97,7 +97,13 @@ namespace AntFarm
 
         // Settings
         private void IdealPop_Click(object sender, RoutedEventArgs e) { }
-        private void ExitGame_Click(object sender, RoutedEventArgs e) { }
+        private void NewGame_Click(object sender, RoutedEventArgs e)
+        {
+            
+            StartUpWIndow startUpWindow = new StartUpWIndow();
+            startUpWindow.Show();
+            this.Close();
+        }
         private void SaveGame_Click(object sender, RoutedEventArgs e) { }
         private void GetStats_Click(object sender, RoutedEventArgs e) { }
 

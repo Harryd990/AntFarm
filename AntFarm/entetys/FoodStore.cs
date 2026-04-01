@@ -26,6 +26,11 @@ namespace AntFarm.entetys
         public override (int, int) Position { get; set; }
         public int virtFoodContained { get; set; } = 0;
 
+        public float fractionoffoodleft()
+        {
+            return (float)foodcontained / capacity;
+        }
+
         public void addfood(Ant ant)
             {
                 foodcontained += ant.foodcarried;

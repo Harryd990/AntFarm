@@ -71,7 +71,7 @@
                             <!-- Settings options -->
                             <StackPanel x:Name="PanelSettings" Visibility="Collapsed">
                                 <Button Content="Ideal Population" Click="IdealPop_Click" Background="White"/>
-                                <Button Content="Exit Game" Click="ExitGame_Click" Background="White"/>
+                                <Button Content="New Game" Click="NewGame_Click" Background="White"/>
                                 <Button Content="Save Game" Click="SaveGame_Click" Background="White"/>
                                 <Button Content="Get Statistics" Click="GetStats_Click" Background="White"/>
                             </StackPanel>

@@ -144,54 +144,87 @@ namespace AntFarm.handelers
         {
             if (e is Food || e is farm || e is FoodStore)
             {
-                Brush fillColor;
-                string labelText;
-                Brush textColor = Brushes.Black;
+                float fillFraction = 0f;
 
-                if (e is Food)
+                if (e is Food f)
                 {
-                    fillColor = Brushes.Yellow; // Vibrant yellow
-                    labelText = "food";
-                }
-                else if (e is farm)
-                {
-                    fillColor = Brushes.ForestGreen; // Deep forest green
-                    labelText = "farm";
-                    textColor = Brushes.White; // Make text readable on dark green background
-                }
-                else // FoodStore
-                {
-                    fillColor = Brushes.Orange;
-                    labelText = "store";
-                }
+                    fillFraction = f.fractionOfFoodLeft();
+                    fillFraction = Math.Max(0f, Math.Min(1f, float.IsNaN(fillFraction) ? 0f : fillFraction));
 
-                // Slightly smaller triangles (brought in coordinates from edges)
-                Polygon triangle = new Polygon
-                {
-                    Fill = fillColor,
-                    Points = new PointCollection
+                    // Natural Food: 5 small orange circles in a pyramid (2 on top, 3 on bottom)
+                    double d = cellWidth * 0.25; // diameter
+                    Brush foodBrush = Brushes.Orange;
+
+                    // Bottom row (3 circles)
+                    double bottomY = yPos + cellHeight * 0.45;
+                    for (int i = 0; i < 3; i++)
                     {
-                        new Point(xPos + cellWidth * 0.5, yPos + cellHeight * 0.1),  // Top Center
-                        new Point(xPos + cellWidth * 0.9, yPos + cellHeight * 0.9),  // Bottom Right
-                        new Point(xPos + cellWidth * 0.1, yPos + cellHeight * 0.9)   // Bottom Left
+                        Ellipse circle = new Ellipse { Width = d, Height = d, Fill = foodBrush, Stroke = Brushes.Black, StrokeThickness = 0.5 };
+                        Canvas.SetLeft(circle, xPos + cellWidth * 0.125 + (i * d));
+                        Canvas.SetTop(circle, bottomY);
+                        canvas.Children.Add(circle);
                     }
-                };
-                canvas.Children.Add(triangle);
 
-                TextBlock label = new TextBlock
+                    // Top row (2 circles)
+                    double topY = yPos + cellHeight * 0.2;
+                    for (int i = 0; i < 2; i++)
+                    {
+                        Ellipse circle = new Ellipse { Width = d, Height = d, Fill = foodBrush, Stroke = Brushes.Black, StrokeThickness = 0.5 };
+                        Canvas.SetLeft(circle, xPos + cellWidth * 0.25 + (i * d));
+                        Canvas.SetTop(circle, topY);
+                        canvas.Children.Add(circle);
+                    }
+                }
+                else
                 {
-                    Text = labelText,
-                    Foreground = textColor,
-                    FontSize = cellHeight * 0.35, // Bigger text
-                    FontWeight = FontWeights.Bold,
-                    TextAlignment = TextAlignment.Center,
-                    Width = cellWidth
+                    Brush fillColor;
+                    if (e is farm fm)
+                    {
+                        fillColor = Brushes.ForestGreen; // Deep forest green
+                        fillFraction = fm.fractionOfFoodLeft();
+                    }
+                    else // FoodStore
+                    {
+                        fillColor = Brushes.SaddleBrown; // Slightly different color for store to distinguish from natural orange food
+                        fillFraction = ((FoodStore)e).fractionoffoodleft();
+                    }
+
+                    fillFraction = Math.Max(0f, Math.Min(1f, float.IsNaN(fillFraction) ? 0f : fillFraction));
+
+                    // Draw Hexagon (6 points) for Stores and Farms
+                    Polygon hexagon = new Polygon
+                    {
+                        Fill = fillColor,
+                        Points = new PointCollection
+                        {
+                            new Point(xPos + cellWidth * 0.5, yPos + cellHeight * 0.1),  // Top Center
+                            new Point(xPos + cellWidth * 0.9, yPos + cellHeight * 0.3),  // Top Right
+                            new Point(xPos + cellWidth * 0.9, yPos + cellHeight * 0.7),  // Bottom Right
+                            new Point(xPos + cellWidth * 0.5, yPos + cellHeight * 0.9),  // Bottom Center
+                            new Point(xPos + cellWidth * 0.1, yPos + cellHeight * 0.7),  // Bottom Left
+                            new Point(xPos + cellWidth * 0.1, yPos + cellHeight * 0.3)   // Top Left
+                        }
+                    };
+                    canvas.Children.Add(hexagon);
+                }
+
+                // Draw Horizontal Fill Bar
+                double maxBarWidth = cellWidth * 0.6; // Max width of the bar
+                double currentBarWidth = maxBarWidth * fillFraction;
+
+                Rectangle bar = new Rectangle
+                {
+                    Width = currentBarWidth,
+                    Height = cellHeight * 0.25, // Increased from 0.15 to make the bar taller
+                    Fill = Brushes.LimeGreen, // Bar color
+                    Stroke = Brushes.Black,
+                    StrokeThickness = 0.5
                 };
 
-                // Push text slightly further down so it fits in the wider bottom part of the triangle
-                Canvas.SetLeft(label, xPos);
-                Canvas.SetTop(label, yPos + (cellHeight * 0.5)); 
-                canvas.Children.Add(label);
+                // Center bar horizontally and align it near the bottom (moved slightly up to fit the taller bar)
+                Canvas.SetLeft(bar, xPos + (cellWidth * 0.2));
+                Canvas.SetTop(bar, yPos + cellHeight * 0.70);
+                canvas.Children.Add(bar);
             }
             else if (e is Egg)
             {

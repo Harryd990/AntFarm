@@ -15,7 +15,7 @@ namespace AntFarm.main
     /*
      * to do:
      * need to add speed stuff (game.step) 
-     * 
+     * need to add ant old age and death and have it so ants wither and die after a certain age and add that to stats and stuff
      * add saving and loading of game state 
      * canceling inputs
      * 
@@ -31,7 +31,15 @@ namespace AntFarm.main
      * - ideal population
      * - exit game 
      * - save game 
-     * - get statistics (eg ants ages and food count how many ants have died ...)
+     * - get statistics 
+     *                  Statistics 
+                        Number of ants currently 
+                        Number of ants ever 
+                        current ant median age
+                        Number of food consumed 
+                        Number of food in stores 
+                        number of buildings made
+                        number of digs done 
      * 
      * Dev tools:
      * - spawn entity (eg queen worker food farm food store at mouse position for testing)

@@ -24,21 +24,30 @@ namespace AntFarm.entetys
         public int antbeenworkingforXticks { get; set; } = 0;
         public int TickToNextHarvest { get; set; } = 10;
         public bool antWorking { get; set; } = false;
-        
+
+        public int maxFoodAmount { get; set; } = 10000;
+        public float fractionOfFoodLeft()
+        {
+            return (float)FoodContained / maxFoodAmount;
+        }
+
         public void HarvestFarm()
         {
-            if (antWorking)
+            if (antWorking && FoodContained <= 9000)
             {
                 FoodContained += 1000;
                 virtFoodContained += 1000;
                 TickToNextHarvest = 10;
             }
+            if(antWorking && FoodContained > 9000)
+            {
+                FoodContained = maxFoodAmount;
+                virtFoodContained = maxFoodAmount;
+                TickToNextHarvest = 10;
+            }
 
             TickToNextHarvest = 10;
-            // ant been working stuff so ants will work for atleast a while on each farm before dipping strait away 
-
-            // add virtual food contained (so tasks can claim food from farm without doubbeling up)
-
+         
         }
         public void TickFarm()
         {
