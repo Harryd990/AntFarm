@@ -36,14 +36,22 @@ namespace AntFarm.handelers
             double cellWidth = canvas.ActualWidth / cols;
             double cellHeight = canvas.ActualHeight / rows;
 
-            // Pre-calculate all dig orders to find them efficiently:
+            // Define which task types get a red 'X' marker on the map
+            var targetTaskTypes = new HashSet<string>(StringComparer.OrdinalIgnoreCase) 
+            { 
+                "dig", 
+                "buildfarm", 
+                "buildfoodstore" 
+            };
+
+            // Pre-calculate all orders to find them efficiently:
             // 1. From pending tasks in the queue
-            var queuedDigs = game.queue1.tasks
-                .Where(t => string.Equals(t.tasktype, "dig", StringComparison.OrdinalIgnoreCase))
+            var queuedMarkers = game.queue1.tasks
+                .Where(t => targetTaskTypes.Contains(t.tasktype))
                 .Select(t => t.targetposition);
 
             // 2. From assigned tasks currently being worked by ants
-            var assignedDigs = new List<(int, int)>();
+            var assignedMarkers = new List<(int, int)>();
             for (int x = 0; x < cols; x++)
             {
                 for (int y = 0; y < rows; y++)
@@ -51,16 +59,16 @@ namespace AntFarm.handelers
                     var cell = game.grid.GetCellAtLocation(x, y);
                     foreach (var e in cell.Entities)
                     {
-                        if (e is Ant ant && ant.Currenttask != null && string.Equals(ant.Currenttask.tasktype, "dig", StringComparison.OrdinalIgnoreCase))
+                        if (e is Ant ant && ant.Currenttask != null && targetTaskTypes.Contains(ant.Currenttask.tasktype))
                         {
-                            assignedDigs.Add(ant.Currenttask.targetposition);
+                            assignedMarkers.Add(ant.Currenttask.targetposition);
                         }
                     }
                 }
             }
 
             // Combine both into a single fast lookup set
-            var digOrders = queuedDigs.Concat(assignedDigs).ToHashSet();
+            var actionMarkers = queuedMarkers.Concat(assignedMarkers).ToHashSet();
 
             // PHASE 1: Draw all base grid cells first (guarantees they stay in the background)
             for (int x = 0; x < cols; x++)
@@ -123,8 +131,8 @@ namespace AntFarm.handelers
                         }
                     }
 
-                    // Draw Dig Orders (Red "X")
-                    if (digOrders.Contains((x, y)))
+                    // Draw Action Orders (Red "X" for dig and build tasks)
+                    if (actionMarkers.Contains((x, y)))
                     {
                         // Use a brighter red and thicker stroke
                         Brush vibrantRed = new SolidColorBrush(Color.FromRgb(255, 0, 0));

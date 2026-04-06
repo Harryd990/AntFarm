@@ -1,6 +1,7 @@
 ﻿using AntFarm.handelers;
 using AntFarm.main;
 using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
@@ -11,6 +12,11 @@ namespace AntFarm
     {
         private Game _game;
         private DispatcherTimer _simTimer;
+        private string _currentStatus = "Simulation ready.";
+        private List<string> _actionLogs = new List<string>();
+
+        // Action delegate to cancel the currently active canvas selection
+        private Action _cancelCurrentSelection;
 
         public MainWindow(Game game)
         {
@@ -31,16 +37,32 @@ namespace AntFarm
             SpeedSlider.ValueChanged += SpeedSlider_ValueChanged;
         }
 
+        private void RefreshUpdatesText()
+        {
+            // Removed extra linebreaks so logs appear exactly underneath the stats line
+            if (_actionLogs.Count > 0)
+            {
+                UpdatesText.Text = $"{_currentStatus}\n" + string.Join("\n", _actionLogs);
+            }
+            else
+            {
+                UpdatesText.Text = _currentStatus;
+            }
+            
+            if (UpdatesText.Parent is ScrollViewer scrollViewer)
+            {
+                scrollViewer.ScrollToBottom();
+            }
+        }
+
         private void SimTimer_Tick(object sender, EventArgs e)
         {
-            // Call the newly created single tick method
             _game.UpdateTick();
-
-            // Re-render the visual state on the canvas
             GridRenderer.Render(_game, MainCanvas);
 
-            // Update the UI text
-            UpdatesText.Text = $"Simulation Running...\nTick: {_game.tick}\nTasks in Queue: {_game.queue1.tasks.Count}";
+            // Only update the static stats, and refresh the box
+            _currentStatus = $"Simulation Running...\nTick: {_game.tick}\nTasks in Queue: {_game.queue1.tasks.Count}";
+            RefreshUpdatesText();
         }
 
         private void SpeedSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -50,7 +72,8 @@ namespace AntFarm
             if (SpeedSlider.Value == 0)
             {
                 _simTimer.Stop();
-                UpdatesText.Text = $"Simulation Paused (Tick: {_game.tick})";
+                _currentStatus = $"Simulation Paused (Tick: {_game.tick})\nTasks in Queue: {_game.queue1.tasks.Count}";
+                RefreshUpdatesText();
             }
             else
             {
@@ -89,13 +112,54 @@ namespace AntFarm
             panelToShow.Visibility = Visibility.Visible;
         }
 
-        // Create and Destroy
-        private void BuildFarm_Click(object sender, RoutedEventArgs e) { }
-        private void BuildFoodStore_Click(object sender, RoutedEventArgs e) { }
-        
-         private void Dig_Click(object sender, RoutedEventArgs e)
+        // Use this before starting any new tool sequence
+        private void CancelActiveTool()
         {
-           
+            if (_cancelCurrentSelection != null)
+            {
+                _cancelCurrentSelection.Invoke();
+                _cancelCurrentSelection = null;
+            }
+        }
+
+        // Create and Destroy
+        private void BuildFarm_Click(object sender, RoutedEventArgs e) 
+        {
+            // Cancel any old tool first
+            CancelActiveTool();
+
+            while (true)
+            {
+                var (gridX, gridY) = canvasCellSelect();
+
+                // If the user right-clicked, the result is (-1, -1), so we break out of the loop
+                if (gridX == -1 || gridY == -1)
+                {
+                    OnGameLogMessage("Exited Build farm Tool");
+                    break;
+                }
+
+                // Check if the cell is underground & open, and doesn't overlap an existing building/food
+                if (_game.OverGAndOpen((gridX, gridY), _game.GridHeight))
+                {
+                    AntFarm.algorithm.Task buildtask = new AntFarm.algorithm.Task(_game.queue1.lasttaskid++, "buildfarm", (gridX, gridY));
+                    _game.queue1.addtask(buildtask);
+                    OnGameLogMessage($"Queued build farm     task at ({gridX}, {gridY})");
+
+                    // Ensure visual update right away
+                    GridRenderer.Render(_game, MainCanvas);
+                }
+                else
+                {
+                    OnGameLogMessage("Invalid Target: Build Overground without overlapping structures.");
+                }
+            }
+        }
+        private void BuildFoodStore_Click(object sender, RoutedEventArgs e)
+        {
+            // Cancel any old tool first
+            CancelActiveTool();
+
             while (true)
             {
                 var (gridX, gridY) = canvasCellSelect();
@@ -103,7 +167,40 @@ namespace AntFarm
                 // If the user right-clicked, the result is (-1, -1), so we break out of the loop
                 if (gridX == -1 || gridY == -1) 
                 {
-                    UpdatesText.Text += "\n- Exited Dig Tool";
+                    OnGameLogMessage("Exited Build Food Store Tool");
+                    break;
+                }
+
+                // Check if the cell is underground & open, and doesn't overlap an existing building/food
+                if (_game.UnderGAndopen((gridX, gridY), _game.GridHeight))
+                {
+                    AntFarm.algorithm.Task buildtask = new AntFarm.algorithm.Task(_game.queue1.lasttaskid++, "buildfoodstore", (gridX, gridY));
+                    _game.queue1.addtask(buildtask);
+                    OnGameLogMessage($"Queued build food store task at ({gridX}, {gridY})");
+                    
+                    // Ensure visual update right away
+                    GridRenderer.Render(_game, MainCanvas);
+                }
+                else
+                {
+                    OnGameLogMessage("Invalid Target: Build underground on non-dirt cells without overlapping structures.");
+                }
+            }
+        }
+        
+         private void Dig_Click(object sender, RoutedEventArgs e)
+        {
+            // Cancel any old tool first
+            CancelActiveTool();
+
+            while (true)
+            {
+                var (gridX, gridY) = canvasCellSelect();
+                
+                // If the user right-clicked, the result is (-1, -1), so we break out of the loop
+                if (gridX == -1 || gridY == -1) 
+                {
+                    OnGameLogMessage("Exited Dig Tool");
                     break;
                 }
 
@@ -114,14 +211,14 @@ namespace AntFarm
                 {
                     AntFarm.algorithm.Task digtask = new AntFarm.algorithm.Task(_game.queue1.lasttaskid++, "dig", (gridX, gridY));
                     _game.queue1.addtask(digtask);
-                    UpdatesText.Text += $"\n- Queued dig task at ({gridX}, {gridY})";
+                    OnGameLogMessage($"Queued dig task at ({gridX}, {gridY})");
                     
                     // Ensure visual update right away
                     GridRenderer.Render(_game, MainCanvas);
                 }
                 else
                 {
-                    MessageBox.Show("You can only dig through dirt or stone cells.", "Invalid Target", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    OnGameLogMessage("Invalid Target: You can only dig through dirt or stone cells.");
                 }   
             }
         }
@@ -132,6 +229,9 @@ namespace AntFarm
         private void IdealPop_Click(object sender, RoutedEventArgs e) 
         {
             if (_game == null) return;
+
+            // Cancel active tools when settings are opened
+            CancelActiveTool();
 
             // Create a small custom popup window in code
             Window inputWindow = new Window
@@ -157,12 +257,12 @@ namespace AntFarm
                 if (int.TryParse(textBox.Text, out int result) && result >= 0)
                 {
                     _game.IdealPopulation = result;
-                    
+                    OnGameLogMessage($"Ideal population updated to {result}");
                     inputWindow.Close();
                 }
                 else
                 {
-                    MessageBox.Show("Please enter a valid positive number.", "Invalid Input", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    OnGameLogMessage("Invalid Input: Please enter a valid positive number for Ideal Population.");
                 }
             };
             panel.Children.Add(submitBtn);
@@ -173,7 +273,7 @@ namespace AntFarm
 
         private void NewGame_Click(object sender, RoutedEventArgs e)
         {
-            
+            CancelActiveTool();
             StartUpWIndow startUpWindow = new StartUpWIndow();
             startUpWindow.Show();
             this.Close();
@@ -202,30 +302,19 @@ namespace AntFarm
 
         private void OnGameLogMessage(string message)
         {
-            // Create the specific log line we want to append
-            string logLine = $"\n- {message}";
-            UpdatesText.Text += logLine;
+            string logLine = $"- {message}";
+            _actionLogs.Add(logLine);
+            RefreshUpdatesText();
 
-            // Scroll to the bottom to make sure the user sees the death notification
-            if (UpdatesText.Parent is ScrollViewer scrollViewer)
-            {
-                scrollViewer.ScrollToBottom();
-            }
-
-            // Start a fire-and-forget background task to remove this specific line after 5 seconds
+            // Remove this specific line after 5 seconds automatically
             System.Threading.Tasks.Task.Run(async () =>
             {
-                await System.Threading.Tasks.Task.Delay(5000);
+                await System.Threading.Tasks.Task.Delay(2000);
 
-                // We must use Dispatcher.Invoke because we are touching UI elements from a background thread!
                 Dispatcher.Invoke(() =>
                 {
-                    // Find and remove the first occurrence of this exact log line
-                    int index = UpdatesText.Text.IndexOf(logLine);
-                    if (index >= 0)
-                    {
-                        UpdatesText.Text = UpdatesText.Text.Remove(index, logLine.Length);
-                    }
+                    _actionLogs.Remove(logLine);
+                    RefreshUpdatesText();
                 });
             });
         }
@@ -246,17 +335,26 @@ namespace AntFarm
                 adornerLayer.Add(redBorder);
             }
 
+            void RemoveHandlersAndBorder()
+            {
+                MainCanvas.PreviewMouseLeftButtonDown -= clickHandler;
+                MainCanvas.PreviewMouseRightButtonDown -= rightClickHandler;
+                if (adornerLayer != null && redBorder != null) adornerLayer.Remove(redBorder);
+                _cancelCurrentSelection = null;
+            }
+
+            // Let the UI button click force this nested loop to yield (-1, -1) and break early
+            _cancelCurrentSelection = () =>
+            {
+                result = (-1, -1);
+                RemoveHandlersAndBorder();
+                frame.Continue = false;
+            };
+
             // Define the logic when a left-click happens
             clickHandler = (s, e) =>
             {
                 Point clickPos = e.GetPosition(MainCanvas);
-                
-                // Unhook events
-                MainCanvas.PreviewMouseLeftButtonDown -= clickHandler;
-                MainCanvas.PreviewMouseRightButtonDown -= rightClickHandler;
-
-                // Remove the red border
-                if (adornerLayer != null && redBorder != null) adornerLayer.Remove(redBorder);
 
                 var (cols, rows) = _game.getGridDims();
                 double cellWidth = MainCanvas.ActualWidth / cols;
@@ -269,21 +367,16 @@ namespace AntFarm
                 gridY = Math.Max(0, Math.Min(rows - 1, gridY));
 
                 result = (gridX, gridY);
+                
+                RemoveHandlersAndBorder();
                 frame.Continue = false;
             };
 
             // Define the logic when right-click happens to cancel
             rightClickHandler = (s, e) =>
             {
-                // Unhook events
-                MainCanvas.PreviewMouseLeftButtonDown -= clickHandler;
-                MainCanvas.PreviewMouseRightButtonDown -= rightClickHandler;
-                
-                // Remove the red border
-                if (adornerLayer != null && redBorder != null) adornerLayer.Remove(redBorder);
-                
-                // Leave result as (-1, -1) to signify canceled action
                 result = (-1, -1);
+                RemoveHandlersAndBorder();
                 frame.Continue = false;
             };
 

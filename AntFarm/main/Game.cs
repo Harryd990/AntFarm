@@ -24,22 +24,15 @@ namespace AntFarm.main
      * create and destroy:
      * - build farm
      * - build food store
-     * - dig
+     * - 
      * - remove building
      * 
      * settings:
-     * - ideal population
-     * - exit game 
+     * - 
+     * -
      * - save game 
-     * - get statistics 
-     *                  Statistics 
-                        Number of ants currently 
-                        Number of ants ever 
-                        current ant median age
-                        Number of food consumed 
-                        Number of food in stores 
-                        number of buildings made
-                        number of digs done 
+     * - 
+     *                  
      * 
      * Dev tools:
      * - spawn entity (eg queen worker food farm food store at mouse position for testing)
@@ -171,7 +164,7 @@ namespace AntFarm.main
 
             for (int i = 2; i <= startingAntCount; i++)
             {
-                // adds 4 workers along the first line of air
+                // adds x workers along the first line of air
                 Entity Worker = new Worker(i, 'A'); 
                 
 
@@ -191,7 +184,7 @@ namespace AntFarm.main
             }
             for (int i = 1; i <= StartingFodCount; i++)
             {
-                // adds 2 bits of food in the air zone 
+                // adds x bits of food in the air zone 
                 Entity food = new Food(lastEntityId++, 0, 0);
                 int x = rand.Next(0, grid.width);
                 int y = rand.Next(0, grid.height / 4);
@@ -244,9 +237,10 @@ namespace AntFarm.main
 
             GeneralTickUpdates();
 
-            if (checkforUnderGroundSpace() && queen.retreting == false)
+            if (queen != null)
+
             {
-                if (queen != null && queen.food >= 60 && queen.EggGracePeriod <= 0 && IdealPopulation > GetAllAnts().Count())
+                if (checkforUnderGroundSpace() && queen.retreting == false && queen.food >= 60 && queen.EggGracePeriod <= 0 && IdealPopulation > GetAllAnts().Count())
                 {
                     algorithm.Task queenTask = new algorithm.Task(queue1.lasttaskid++, "queenretrete", queen.Position);
                     if (queen.clamedtaskid == -1 || queen.Currenttask.tasktype == "wander")
@@ -379,7 +373,11 @@ namespace AntFarm.main
         }
         public void GeneralTickUpdates()
         {
-            queen.EggGracePeriod--;
+            if(queen != null)
+            {
+                queen.EggGracePeriod--;
+            }
+              
             ProcessEggHatching();
             Check4EmptyStores();
             UpdateFarms();
@@ -442,7 +440,7 @@ namespace AntFarm.main
                 }
             }
         }
-        public bool UnderGAndOpen((int x, int y) coords, int gridHeight)
+        public bool UnderGAndopen((int x, int y) coords, int gridHeight)
         {
             int y = coords.y;
             // Check if y is in the bottom 3/4 of the grid
@@ -453,6 +451,9 @@ namespace AntFarm.main
             var cellType = GetCellType(coords.x, coords.y);
             if (cellType == "dirt")
                 return false;
+            if (Check4superimpose(coords) == false)
+                return false;
+            
 
             return true;
         }
@@ -461,7 +462,22 @@ namespace AntFarm.main
             var cell = grid.GetCellAtLocation(x, y);
             return cell.GetType().Name;
         }
+        public bool OverGAndOpen((int x, int y) coords, int gridHeight)
+        {
+            int y = coords.y;
+            // Check if y is in the top 3/4 of the grid
+            if (y >= gridHeight / 4)
+                return false;
 
+            // Check if the cell is not dirt
+            var cellType = GetCellType(coords.x, coords.y);
+            if (cellType == "dirt")
+                return false;
+            if (Check4superimpose(coords) == false)
+                return false;
+
+            return true;
+        }
         public (int,int) Fullinput4building()
         {
             // use both get cords and check4 super impose to get valid cords for building
@@ -470,7 +486,7 @@ namespace AntFarm.main
                 var cords = UserInputCords();
                 if (Check4superimpose(cords))
                 {
-                    if(UnderGAndOpen(cords, grid.height))
+                    if(UnderGAndopen(cords, grid.height))
                     {
                         return cords;
                     }
@@ -830,7 +846,7 @@ namespace AntFarm.main
                         // Validate current target cell. If invalid, try to pick a new valid underground cell.
                         bool currentTargetValid =
                             grid.IsInGridRange(task.targetposition.Item1, task.targetposition.Item2) &&
-                            UnderGAndOpen(task.targetposition, grid.height) &&
+                            UnderGAndopen(task.targetposition, grid.height) &&
                             !grid.GetCellAtLocation(task.targetposition.Item1, task.targetposition.Item2).Entities.OfType<FoodStore>().Any() &&
                             !grid.GetCellAtLocation(task.targetposition.Item1, task.targetposition.Item2).Entities.OfType<farm>().Any() &&
                             !grid.GetCellAtLocation(task.targetposition.Item1, task.targetposition.Item2).Entities.OfType<Food>().Any();
