@@ -79,7 +79,7 @@
                             <!-- Dev Tools options -->
                             <StackPanel x:Name="PanelDevTools" Visibility="Collapsed">
                                 <Button Content="Spawn Entity" Click="SpawnEntity_Click" Background="White"/>
-                                <Button Content="Remove Area" Click="RemoveArea_Click" Background="White"/>
+                                <Button Content="Clear Cell" Click="ClearCell_Click" Background="White"/>
                                 <Button Content="Get Cell Details" Click="GetCellDetails_Click" Background="White"/>
                                 <Button Content="Edit Entity Details" Click="EditEntity_Click" Background="White"/>
                             </StackPanel>

@@ -1,7 +1,9 @@
-﻿using AntFarm.handelers;
+﻿using AntFarm.entetys;
+using AntFarm.handelers;
 using AntFarm.main;
 using System;
 using System.Collections.Generic;
+using System.Security.Policy;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
@@ -223,7 +225,10 @@ namespace AntFarm
             }
         }
         
-        private void RemoveBuilding_Click(object sender, RoutedEventArgs e) { }
+        private void RemoveBuilding_Click(object sender, RoutedEventArgs e)
+        {
+            Remover(false);
+        }
 
         // Settings
         private void IdealPop_Click(object sender, RoutedEventArgs e) 
@@ -296,7 +301,10 @@ namespace AntFarm
 
         // Dev Tools
         private void SpawnEntity_Click(object sender, RoutedEventArgs e) { }
-        private void RemoveArea_Click(object sender, RoutedEventArgs e) { }
+        private void ClearCell_Click(object sender, RoutedEventArgs e) 
+        {
+            Remover(true);
+        }
         private void GetCellDetails_Click(object sender, RoutedEventArgs e) { }
         private void EditEntity_Click(object sender, RoutedEventArgs e) { }
 
@@ -318,6 +326,67 @@ namespace AntFarm
                 });
             });
         }
+        
+        public void Remover(bool Devmode)
+        {
+            while (true)
+            {
+                var (gridX, gridY) = canvasCellSelect();
+
+                if (gridX == -1 || gridY == -1)
+                {
+                    OnGameLogMessage("Exited Remover Tool");
+                    break;
+                }
+
+                var cell = _game.grid.GetCellAtLocation(gridX, gridY);
+
+                if (Devmode == true)
+                {
+                    // This removes all entities in the cell (ants, all types of food and buildings)
+                    var entitiesToRemove = cell.Entities.ToList();
+                    foreach (var entity in entitiesToRemove)
+                    {
+                        cell.RemoveEntity(entity);
+                    }
+
+                    // If below ground, turn it into dirt
+                    if (gridY >= _game.GridHeight / 4)
+                    {
+                        _game.ReplaceCellAtLocation(gridX, gridY, new Dirt(gridX, gridY));
+                    }
+                    
+                    OnGameLogMessage($"Cleared all entities at ({gridX}, {gridY})");
+                }
+                else
+                {
+                    // This should just remove farms and food stores
+                    var farmEntity = cell.Entities.OfType<farm>().FirstOrDefault();
+                    if (farmEntity != null)
+                    {
+                        cell.RemoveEntity(farmEntity);
+                        OnGameLogMessage($"Removed farm at ({gridX}, {gridY})");
+                        GridRenderer.Render(_game, MainCanvas);
+                        continue;
+                    }
+                    
+                    var storeEntity = cell.Entities.OfType<FoodStore>().FirstOrDefault();
+                    if (storeEntity != null)
+                    {
+                        cell.RemoveEntity(storeEntity);
+                        OnGameLogMessage($"Removed food store at ({gridX}, {gridY})");
+                        GridRenderer.Render(_game, MainCanvas);
+                        continue;
+                    }
+
+                    OnGameLogMessage($"No farm or food store found at ({gridX}, {gridY}) to remove.");
+                }
+
+                // Force a visual update so the cell clears right away
+                GridRenderer.Render(_game, MainCanvas);
+            }
+        }
+        
         public (int, int) canvasCellSelect()
         {
             var frame = new DispatcherFrame();

@@ -895,8 +895,7 @@ namespace AntFarm.main
                         // Decrement gestationperiod and check for egg laying
                         q.gestationperiod--;
 
-                        // Debug: show remaining gestation ticks (remove or reduce later)
-                        Console.WriteLine($"Queen gestation ticks remaining: {q.gestationperiod}");
+                        
 
                         if (q.gestationperiod <= 0)
                         {
@@ -1357,17 +1356,49 @@ namespace AntFarm.main
                     workercount--;
                     OnSimulationLog?.Invoke($"An ant has died of hunger at ({pos.Item1},{pos.Item2})");
                 }
+                if (ant.age >= 500)
+                {
+                    int rand = new Random().Next(1, 100);
+                    if (rand <= 1) // 1% chance of dying from old age
+                    {
+                        // remove ant from grid
+                        var pos = ant.Position;
+                        var cell = grid.GetCellAtLocation(pos.Item1, pos.Item2);
+                        cell.RemoveEntity(ant);
+                        workercount--;
+                        OnSimulationLog?.Invoke($"An ant has died of old age at ({pos.Item1},{pos.Item2})");
+
+                    }
+                }
+                if (ant != null)
+                {
+                    int rand = new Random().Next(1, 1000);
+                    if (rand <= 1) // 0.1% chance of dying from old age
+                    {
+                        // remove ant from grid
+                        var pos = ant.Position;
+                        var cell = grid.GetCellAtLocation(pos.Item1, pos.Item2);
+                        cell.RemoveEntity(ant);
+                        workercount--;
+                        OnSimulationLog?.Invoke($"An ant has died of old age at ({pos.Item1},{pos.Item2})");
+
+                    }
+                }
                 if (ant.age >= 1000)
                 {
-                    // remove ant from grid
-                    var pos = ant.Position;
-                    var cell = grid.GetCellAtLocation(pos.Item1, pos.Item2);
-                    cell.RemoveEntity(ant);
-                    workercount--;
-                    OnSimulationLog?.Invoke($"An ant has died of old age at ({pos.Item1},{pos.Item2})");
+                    int rand = new Random().Next(1, 100);
+                    if (rand <= 5) // 5% chance of dying from old age
+                    {
+                        // remove ant from grid
+                        var pos = ant.Position;
+                        var cell = grid.GetCellAtLocation(pos.Item1, pos.Item2);
+                        cell.RemoveEntity(ant);
+                        workercount--;
+                        OnSimulationLog?.Invoke($"An ant has died of old age at ({pos.Item1},{pos.Item2})");
+
+                    }
                 }
             }
-            
         }
         
         public void CreateFoodStore(int x, int y)
