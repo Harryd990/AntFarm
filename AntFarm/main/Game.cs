@@ -41,7 +41,13 @@ namespace AntFarm.main
      * - edit entity details (eg change food amount in food store or food source or change ant food or age or something)
      * 
      * possible bugs
-     * - 
+     * - may need to add precidence to tasks as the farms are eating all my workers also should make it so queen doesnt work in farms
+     * - farms sorta kinda work
+     * - when u clear a cell it is in limbo between dug undug its desplayed as dirt but acts more like air 
+     * - prolly a whole lot of bugs wid edit and spawn entitys
+     * - you can do 2 build orders in the same spot making over lapping buildings etc which u shouldnt be able to do 
+     * - dig xs seem to diapeer after a fixed length of time which is starnge
+     * - make it so dig tasks can be queued anywhere
      * - the farmwork task is being called multiple times 
      * - ants maight not being assigned wander tasks enough
      * - when innitalising with sliders you can add more ants then there is space in grid
@@ -777,6 +783,24 @@ namespace AntFarm.main
                             ant.path = null;
                             return;
                         }
+
+                        // --- NEW: Allow gathering food from Farms ---
+                        var farmStore = foodCell.Entities.OfType<farm>().FirstOrDefault(f => f.FoodContained > 0);
+                        if (farmStore != null)
+                        {
+                            int foodNeeded = ant.maxfood - ant.food;
+                            if (foodNeeded > 0)
+                            {
+                                int taken = Math.Min(foodNeeded, farmStore.FoodContained);
+                                farmStore.FoodContained -= taken;
+                                ant.food += taken;
+                            }
+                            ant.Currenttask = null;
+                            ant.clamedtaskid = -1;
+                            ant.path = null;
+                            return;
+                        }
+                        // --------------------------------------------
 
                         var foodEntity = foodCell.Entities.OfType<Food>().FirstOrDefault();
                         if (foodEntity != null)
@@ -1601,7 +1625,47 @@ namespace AntFarm.main
                 }
             }
 
-            // 2. If no FoodStore with food, fall back to closest Food entity
+            // --- NEW REPLACEMENT: 2. If no FoodStore with food, try to find the closest Farm with food ---
+            List<farm> foodFarms = new List<farm>();
+            for (int x = 0; x < grid.width; x++)
+            {
+                for (int y = 0; y < grid.height; y++)
+                {
+                    var cell = grid.GetCellAtLocation(x, y);
+                    foreach (var entity in cell.Entities)
+                    {
+                        if (entity is farm f && f.virtFoodContained > 0)
+                        {
+                            foodFarms.Add(f);
+                        }
+                    }
+                }
+            }
+            if (foodFarms.Count > 0)
+            {
+                int closestdistanceFarm = int.MaxValue;
+                farm closestFarm = null;
+                foreach (var f in foodFarms)
+                {
+                    int distance = Math.Abs(ant.Position.Item1 - f.Position.Item1) + Math.Abs(ant.Position.Item2 - f.Position.Item2);
+                    if (distance < closestdistanceFarm)
+                    {
+                        closestdistanceFarm = distance;
+                        closestFarm = f;
+                    }
+                }
+                if (closestFarm != null)
+                {
+                    algorithm.Task foodtask = new algorithm.Task(queue1.lasttaskid++, "gatherfood", closestFarm.Position);
+                    closestFarm.virtFoodContained -= Math.Min(ant.maxfood - ant.food, closestFarm.virtFoodContained);
+                    ant.Currenttask = foodtask;
+                    ant.clamedtaskid = foodtask.id;
+                    return;
+                }
+            }
+            // ------------------------------------------------------------------------------------------
+
+            // 3. (Previously 2) If no FoodStore and no Farm with food, fall back to closest natural Food entity
             List<Food> foodnat = new List<Food>();
             for (int x = 0; x < grid.width; x++)
             {
@@ -1675,7 +1739,7 @@ namespace AntFarm.main
             int goalX = endX;
             int goalY = endY;
 
-            // if goal cell ismnt traversable find closest adjacent traversable cell (will have to add doubble check for doubble land locked)
+            // if goal cell ismnt traversable find closest adjacent traversable cell (will have to add doubble check for doubble landlocked)
             var goalCell = grid.GetCellAtLocation(endX, endY);
             if (!goalCell.IsTraversable)
             {

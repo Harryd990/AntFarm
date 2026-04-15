@@ -6,11 +6,12 @@ using System.Threading.Tasks;
 
 namespace AntFarm.Saving
 {
-    public class CellSave
+    public class taskSaving
     {
-        public int X { get; set; }
-        public int Y { get; set; }
+        public int id { get; set; }
+        public string taskType { get; set; }
         
-        public string CellType { get; set; }
+        public (int,int) targetpositionX { get; set; }
+
     }
 }

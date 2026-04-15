@@ -1,18 +1,9 @@
-﻿using AntFarm.handelers;
-using AntFarm.main;
+﻿using AntFarm.main;
+using AntFarm.handelers;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace AntFarm
 {
@@ -26,7 +17,6 @@ namespace AntFarm
         public StartUpWIndow()
         {
             InitializeComponent();
-            
         }
 
         private void NewGameButton_Click(object sender, RoutedEventArgs e)
@@ -35,9 +25,9 @@ namespace AntFarm
 
             if (isValid)
             {
-                MainWindow mainWindow = new MainWindow(newgame);
-                mainWindow.Show();
-                this.Close();
+                 MainWindow mainWindow = new MainWindow(newgame);
+                 mainWindow.Show();
+                 this.Close();
             }
             else
             {
@@ -47,28 +37,91 @@ namespace AntFarm
 
         private void LoadGameButton_Click(object sender, RoutedEventArgs e)
         {
-            // do later but is just loading grid and variables from a file then opening main window with those settings
+            string documentsFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            string saveDirectory = Path.Combine(documentsFolder, "AntFarmSaves");
 
-        }
+            if (!Directory.Exists(saveDirectory))
+            {
+                MessageBox.Show("No saves directory found. Create a valid save first.", "No Saves", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
 
-        private void FoodCountSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
+            string[] saveFiles = Directory.GetFiles(saveDirectory, "*.json");
+
+            if (saveFiles.Length == 0)
+            {
+                MessageBox.Show("No save files exist in your save folder yet.", "No Saves", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            // Create a custom popup window for file selection
+            Window loadWindow = new Window
+            {
+                Title = "Select a Save to Load",
+                Width = 400,
+                Height = 350,
+                WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                Owner = this,
+                ResizeMode = ResizeMode.NoResize
+            };
+
+            StackPanel panel = new StackPanel { Margin = new Thickness(15) };
+            panel.Children.Add(new TextBlock { Text = "Available Saves:", Margin = new Thickness(0, 0, 0, 10) });
+
+            // Create ListBox with scrollviewer active
+            ListBox fileListBox = new ListBox
+            {
+                Height = 220,
+                Margin = new Thickness(0, 0, 0, 10)
+            };
             
+            // Set the attached property outside the object initializer
+            ScrollViewer.SetVerticalScrollBarVisibility(fileListBox, ScrollBarVisibility.Auto);
+
+            foreach (string file in saveFiles)
+            {
+                fileListBox.Items.Add(Path.GetFileName(file));
+            }
+            // By default select the most recent based on autosave logic, or just first
+            fileListBox.SelectedIndex = 0;
+
+            panel.Children.Add(fileListBox);
+
+            Button loadBtn = new Button { Content = "Load Game", Width = 100, HorizontalAlignment = HorizontalAlignment.Right };
+            loadBtn.Click += (s, args) =>
+            {
+                string selectedFile = fileListBox.SelectedItem as string;
+                if (!string.IsNullOrEmpty(selectedFile))
+                {
+                    string fullPath = Path.Combine(saveDirectory, selectedFile);
+                    
+                    // Validate and ensure game isn't corrupted using Gamestart handler
+                    (Game? loadedGame, bool isValid) = Gamestart.HandleLoadGame(fullPath);
+
+                    if (isValid && loadedGame != null)
+                    {
+                        MainWindow mainWindow = new MainWindow(loadedGame);
+                        mainWindow.Show();
+
+                        // Close both the Custom Popup and the Startup menu
+                        loadWindow.Close();
+                        this.Close(); 
+                    }
+                    else
+                    {
+                        MessageBox.Show("The save file is corrupted, empty, or failed to process correctly.", "Corrupted Save", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+            };
+            panel.Children.Add(loadBtn);
+
+            loadWindow.Content = panel;
+            loadWindow.ShowDialog();
         }
 
-        private void GridHeightSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-
-        }
-
-        private void GridWidthSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-
-        }
-
-        private void AntCountSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-
-        }
+        private void FoodCountSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) { }
+        private void GridHeightSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) { }
+        private void GridWidthSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) { }
+        private void AntCountSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) { }
     }
 }

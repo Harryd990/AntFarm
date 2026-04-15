@@ -24,7 +24,13 @@ namespace AntFarm
         {
             InitializeComponent();
             _game = game;
-            _game.Initialise_Game();
+            
+            // Fix: Only run initialization if this is a fresh start (0 ticks progressed)
+            if (_game.tick == 0 && _game.totalAntsEver == 0)
+            {
+                _game.Initialise_Game();
+            }
+            
             _game.OnSimulationLog += OnGameLogMessage; 
 
             // 1. Initialize the UI Timer
@@ -286,7 +292,61 @@ namespace AntFarm
             startUpWindow.Show();
             this.Close();
         }
-        private void SaveGame_Click(object sender, RoutedEventArgs e) { }
+        private void SaveGame_Click(object sender, RoutedEventArgs e) 
+        {
+            if (_game == null) return;
+
+            // Pause the simulation while saving
+            double currentSpeed = SpeedSlider.Value;
+            SpeedSlider.Value = 0;
+            CancelActiveTool();
+
+            // Create a custom popup window in code
+            Window inputWindow = new Window
+            {
+                Title = "Save Game",
+                Width = 350,
+                Height = 150,
+                WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                Owner = this,
+                ResizeMode = ResizeMode.NoResize
+            };
+
+            StackPanel panel = new StackPanel { Margin = new Thickness(15) };
+            panel.Children.Add(new TextBlock { Text = "Enter a name for your save file:", Margin = new Thickness(0, 0, 0, 10) });
+
+            // Ensure the filename is safe by replacing invalid characters like ':' and '/'
+            string defaultName = $"Antfarm_{DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss")}";
+            TextBox textBox = new TextBox { Text = defaultName, Padding = new Thickness(2) };
+            panel.Children.Add(textBox);
+
+            Button submitBtn = new Button { Content = "Save", Width = 80, Margin = new Thickness(0, 15, 0, 0), HorizontalAlignment = HorizontalAlignment.Right };
+            submitBtn.Click += (s, args) =>
+            {
+                string filename = textBox.Text.Trim();
+                
+                // Add the .json extension if they didn't type it
+                if (!filename.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
+                {
+                    filename += ".json";
+                }
+
+                // Call your save manager
+                var saver = new AntFarm.Saving.SaveManager();
+                saver.SaveGame(_game, filename);
+
+                OnGameLogMessage($"Game logic saved to {filename}");
+                inputWindow.Close();
+
+                // Restore previous speed
+                SpeedSlider.Value = currentSpeed;
+            };
+            
+            panel.Children.Add(submitBtn);
+
+            inputWindow.Content = panel;
+            inputWindow.ShowDialog();
+        }
         
         private void GetStats_Click(object sender, RoutedEventArgs e) 
         {
@@ -677,7 +737,7 @@ namespace AntFarm
                 panel.Children.Add(tb);
                 intPropertiesToSave.Add(propName, (setter, tb));
             }
-             // may be some issues cos of virtal food contained but as long as the user doesnt set the food to 0 should be fine but even if they do the ant will just go away as calcs are done on the actual food stores 
+             // may be some issues cos of virtal food contained but as long as the user doesnt set the food to 0 should be fine but even if they do the ant will go away as calcs are done on the actual food stores 
             if (entity is AntFarm.entetys.Ant ant)
             {
                 AddEditableIntProperty("Age", ant.age, val => ant.age = val);
