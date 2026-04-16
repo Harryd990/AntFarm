@@ -13,33 +13,8 @@ using System.Threading.Tasks;
 namespace AntFarm.main
 {
     /*
-     * to do:
-     * need to add speed stuff (game.step) 
-     * need to add ant old age and death and have it so ants wither and die after a certain age and add that to stats and stuff
-     * add saving and loading of game state 
-     * canceling inputs
-     * 
-     * what goes on what 
-     * 
-     * create and destroy:
-     * - build farm
-     * - build food store
-     * - 
-     * - remove building
-     * 
-     * settings:
-     * - 
-     * -
-     * - save game 
-     * - 
-     *                  
-     * 
-     * Dev tools:
-     * - spawn entity (eg queen worker food farm food store at mouse position for testing)
-     * - remove area 
-     * - get cell details 
-     * - edit entity details (eg change food amount in food store or food source or change ant food or age or something)
-     * 
+    
+   
      * possible bugs
      * - may need to add precidence to tasks as the farms are eating all my workers also should make it so queen doesnt work in farms
      * - farms sorta kinda work
@@ -52,11 +27,6 @@ namespace AntFarm.main
      * - ants maight not being assigned wander tasks enough
      * - when innitalising with sliders you can add more ants then there is space in grid
      * - air is somethings going green when undergound on smaller / none whole grid sizes
-     *  
-     * 
-     * 
-     * 
-     * 
      * */
 
     public class Game
