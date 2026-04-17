@@ -12,7 +12,7 @@ namespace AntFarm.handelers
 {
     public class GridRenderer
     {
-        // Air is now #a9f56e (RGB: 169, 245, 110)
+        
         private static readonly Dictionary<string, Brush> CellBrushes = new(StringComparer.OrdinalIgnoreCase)
         {
             { "Air",   new SolidColorBrush(Color.FromRgb(169, 245, 110)) }, 

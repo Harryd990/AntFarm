@@ -27,6 +27,9 @@ namespace AntFarm.main
      * - ants maight not being assigned wander tasks enough
      * - when innitalising with sliders you can add more ants then there is space in grid
      * - air is somethings going green when undergound on smaller / none whole grid sizes
+     * - not sure ants are transfering food from farm to store properly
+     * when u edit food stores the ants wont eat from them?
+     * total food consumed not working
      * */
 
     public class Game
