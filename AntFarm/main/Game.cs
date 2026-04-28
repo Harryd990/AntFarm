@@ -15,6 +15,7 @@ namespace AntFarm.main
     /*
     add tool tips to all methods and properties
     check on the start up window that it only counts the air space for the number of ants that can be added at the start and not the whole grid
+    in the remove food methord if the food store should it be carried or should it be in the ants belly maybe add somthing in ant so that it can transfer food carried to belly food if its lower then x 
    
      * possible bugs
      * - may need to add precidence to tasks as the farms are eating all my workers also should make it so queen doesnt work in farms
