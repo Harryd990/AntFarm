@@ -7,9 +7,7 @@ using System.Windows.Controls;
 
 namespace AntFarm
 {
-    /// <summary>
-    /// Interaction logic for StartUpWIndow.xaml
-    /// </summary>
+    
     public partial class StartUpWIndow : Window
     {
         Game newgame;
@@ -54,7 +52,7 @@ namespace AntFarm
                 return;
             }
 
-            // Create a custom popup window for file selection
+            // popup window for file selection
             Window loadWindow = new Window
             {
                 Title = "Select a Save to Load",
@@ -68,21 +66,21 @@ namespace AntFarm
             StackPanel panel = new StackPanel { Margin = new Thickness(15) };
             panel.Children.Add(new TextBlock { Text = "Available Saves:", Margin = new Thickness(0, 0, 0, 10) });
 
-            // Create ListBox with scrollviewer active
+            //  ListBox with scrollviewer active
             ListBox fileListBox = new ListBox
             {
                 Height = 220,
                 Margin = new Thickness(0, 0, 0, 10)
             };
             
-            // Set the attached property outside the object initializer
+          
             ScrollViewer.SetVerticalScrollBarVisibility(fileListBox, ScrollBarVisibility.Auto);
 
             foreach (string file in saveFiles)
             {
                 fileListBox.Items.Add(Path.GetFileName(file));
             }
-            // By default select the most recent based on autosave logic, or just first
+            // By default select the most recent based on autosave logic or just first
             fileListBox.SelectedIndex = 0;
 
             panel.Children.Add(fileListBox);
@@ -95,7 +93,7 @@ namespace AntFarm
                 {
                     string fullPath = Path.Combine(saveDirectory, selectedFile);
                     
-                    // Validate and ensure game isn't corrupted using Gamestart handler
+                    // Validate and ensure game isnt corrupted using Gamestart handler
                     (Game? loadedGame, bool isValid) = Gamestart.HandleLoadGame(fullPath);
 
                     if (isValid && loadedGame != null)
@@ -103,7 +101,7 @@ namespace AntFarm
                         MainWindow mainWindow = new MainWindow(loadedGame);
                         mainWindow.Show();
 
-                        // Close both the Custom Popup and the Startup menu
+                        
                         loadWindow.Close();
                         this.Close(); 
                     }

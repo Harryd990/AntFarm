@@ -15,15 +15,18 @@ namespace AntFarm.entetys
             }
             public override int Id { get; set; }
 
-        // amount of food stored 
+        
             public int foodcontained { get; set; } = 0;
             public int capacity { get; set; } = 10000;
 
-        // symbol and species for this entity
+       
         public override char Species { get; set; } = 'S';
-            public override string Symbol { get; set; } = "[S]";
+       
 
         public override (int, int) Position { get; set; }
+
+
+        // virtual food is used so if a ant has a task to take the food from x it will reserve that food so other ants dont nick it 
         public int virtFoodContained { get; set; } = 0;
 
         public float fractionoffoodleft()
@@ -48,7 +51,7 @@ namespace AntFarm.entetys
                     foodcontained -= ant.foodcarried;
                 }
         }
-        // add stuff to make it so food stores can only be made underground + farms too 
+       
 
 
     }

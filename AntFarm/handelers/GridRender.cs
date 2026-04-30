@@ -44,13 +44,13 @@ namespace AntFarm.handelers
                 "buildfoodstore" 
             };
 
-            // Pre-calculate all orders to find them efficiently:
-            // 1. From pending tasks in the queue
+            // Pre-calculate all orders to find them easily when rendering
+           
             var queuedMarkers = game.queue1.tasks
                 .Where(t => targetTaskTypes.Contains(t.tasktype))
                 .Select(t => t.targetposition);
 
-            // 2. From assigned tasks currently being worked by ants
+            //  From assigned tasks currently being worked by ants
             var assignedMarkers = new List<(int, int)>();
             for (int x = 0; x < cols; x++)
             {
@@ -67,10 +67,10 @@ namespace AntFarm.handelers
                 }
             }
 
-            // Combine both into a single fast lookup set
+            // creates look up set for ants that are currently working task so x can be drawn easy 
             var actionMarkers = queuedMarkers.Concat(assignedMarkers).ToHashSet();
 
-            // PHASE 1: Draw all base grid cells first (guarantees they stay in the background)
+            // Draw all base grid cells first (so they are in the background)
             for (int x = 0; x < cols; x++)
             {
                 for (int y = 0; y < rows; y++)
@@ -83,7 +83,7 @@ namespace AntFarm.handelers
 
                     Brush fillBrush;
                     // If it's Air and in the bottom 3/4 of the grid, use the underground color
-                    if (string.Equals(cellType, "Air", StringComparison.OrdinalIgnoreCase) && y >= rows / 4.0)
+                    if (string.Equals(cellType, "Air", StringComparison.OrdinalIgnoreCase) && y > rows / 4.0)
                     {
                         fillBrush = UndergroundAirBrush;
                     }
@@ -106,7 +106,7 @@ namespace AntFarm.handelers
                 }
             }
 
-            // PHASE 2: Draw top entity and markers
+            // Draw top entity and markers
             for (int x = 0; x < cols; x++)
             {
                 for (int y = 0; y < rows; y++)
@@ -119,6 +119,7 @@ namespace AntFarm.handelers
 
                     if (entities.Count > 0)
                     {
+                        // precidence order: buuildings > Queen > Egg > Ants 
                         // Get highest precedence entity (lowest number)
                         var entityToDraw = entities.OrderBy(e => GetPrecedence(e)).First();
                         
@@ -134,7 +135,7 @@ namespace AntFarm.handelers
                     // Draw Action Orders (Red "X" for dig and build tasks)
                     if (actionMarkers.Contains((x, y)))
                     {
-                        // Use a brighter red and thicker stroke
+                        
                         Brush vibrantRed = new SolidColorBrush(Color.FromRgb(255, 0, 0));
                         double markerThickness = Math.Max(3, cellWidth * 0.1);
 
@@ -188,10 +189,10 @@ namespace AntFarm.handelers
                     fillFraction = Math.Max(0f, Math.Min(1f, float.IsNaN(fillFraction) ? 0f : fillFraction));
 
                     // Natural Food: 5 small orange circles in a pyramid (2 on top, 3 on bottom)
-                    double d = cellWidth * 0.25; // diameter
+                    double d = cellWidth * 0.25; 
                     Brush foodBrush = Brushes.Orange;
 
-                    // Bottom row (3 circles)
+                   // bottom row
                     double bottomY = yPos + cellHeight * 0.45;
                     for (int i = 0; i < 3; i++)
                     {
@@ -201,7 +202,7 @@ namespace AntFarm.handelers
                         canvas.Children.Add(circle);
                     }
 
-                    // Top row (2 circles)
+                   // top row
                     double topY = yPos + cellHeight * 0.2;
                     for (int i = 0; i < 2; i++)
                     {
@@ -216,12 +217,12 @@ namespace AntFarm.handelers
                     Brush fillColor;
                     if (e is farm fm)
                     {
-                        fillColor = Brushes.ForestGreen; // Deep forest green
+                        fillColor = Brushes.ForestGreen; 
                         fillFraction = fm.fractionOfFoodLeft();
                     }
-                    else // FoodStore
+                    else 
                     {
-                        fillColor = Brushes.SaddleBrown; // Slightly different color for store to distinguish from natural orange food
+                        fillColor = Brushes.SaddleBrown; 
                         fillFraction = ((FoodStore)e).fractionoffoodleft();
                     }
 
@@ -253,20 +254,20 @@ namespace AntFarm.handelers
                 Rectangle bar = new Rectangle
                 {
                     Width = currentBarWidth,
-                    Height = cellHeight * 0.25, // Increased from 0.15 to make the bar taller
-                    Fill = Brushes.LimeGreen, // Bar color
+                    Height = cellHeight * 0.25, 
+                    Fill = Brushes.LimeGreen, 
                     Stroke = Brushes.Black,
                     StrokeThickness = 0.5
                 };
 
-                // Center bar horizontally and align it near the bottom (moved slightly up to fit the taller bar)
+                // bar centering
                 Canvas.SetLeft(bar, xPos + (cellWidth * 0.2));
                 Canvas.SetTop(bar, yPos + cellHeight * 0.70);
                 canvas.Children.Add(bar);
             }
             else if (e is Egg)
             {
-                // Scaled down to 0.25 and perfectly centered
+                
                 double eggSize = cellWidth * 0.25;
                 
                 Ellipse e1 = new Ellipse { Width = eggSize, Height = eggSize, Fill = Brushes.White, Stroke = Brushes.Black, StrokeThickness = 0.5 };
@@ -308,7 +309,7 @@ namespace AntFarm.handelers
             {
                 Text = $"+{additionalCount}",
                 Foreground = Brushes.White,
-                Background = new SolidColorBrush(Color.FromArgb(200, 0, 0, 0)), // Semi-transparent black background
+                Background = new SolidColorBrush(Color.FromArgb(200, 0, 0, 0)), 
                 FontSize = cellHeight * 0.35,
                 FontWeight = FontWeights.Bold,
                 Padding = new Thickness(1)

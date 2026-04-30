@@ -23,12 +23,13 @@ namespace AntFarm.Saving
             Directory.CreateDirectory(saveDirectory); 
 
             // If the UI passes just a filename (e.g., "save1.json"), we combine it with the Document's save directory.
-            // (Path.GetFileName ensures we just take "name.json" and append it properly)
+            
             string safeFileName = string.IsNullOrWhiteSpace(filePath) ? "autosave.json" : Path.GetFileName(filePath);
             
             string fullPath = Path.Combine(saveDirectory, safeFileName);
 
-            // 1. Initialize the master GameSave object
+            
+            // innitalise master game same
             var gameSave = new GameSave
             {
                 SaveTime = DateTime.Now,
@@ -37,7 +38,7 @@ namespace AntFarm.Saving
                 tick = game.tick
             };
 
-            // 2. Loop through the grid
+            //Loop through the grid
             for (int x = 0; x < game.GridWidth; x++)
             {
                 for (int y = 0; y < game.GridHeight; y++)
@@ -52,7 +53,7 @@ namespace AntFarm.Saving
                         CellType = cell.GetType().Name
                     });
 
-                    // 3. Process Entities on that cell
+                    // Process Entities on that cell
                     foreach (var entity in cell.Entities)
                     {
                         EntitySave? saveObj = null;
@@ -215,9 +216,9 @@ namespace AntFarm.Saving
                     };
                     newEntity = egg;
                 }
-                else if (entSave is FarmSave fs) // <--- Check for FarmSave FIRST!
+                else if (entSave is FarmSave fs) 
                 {
-                    if (fs.species == 'R') // Explicitly checking for R (Farm)
+                    if (fs.species == 'R') 
                     {
                         var farmEnt = new farm(fs.id, fs.species)
                         {

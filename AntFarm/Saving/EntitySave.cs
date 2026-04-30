@@ -10,7 +10,7 @@ namespace AntFarm.Saving
     // The TypeDiscriminatorPropertyName defines the key in the JSON ("type": "Ant")
     [JsonPolymorphic(TypeDiscriminatorPropertyName = "type")]
     
-    // Register all your derived classes here
+    //derived classes here
     [JsonDerivedType(typeof(AntSave), typeDiscriminator: "Ant")]
     [JsonDerivedType(typeof(QueenSave), typeDiscriminator: "Queen")]
     [JsonDerivedType(typeof(EggSave), typeDiscriminator: "Egg")]

@@ -15,7 +15,7 @@ namespace AntFarm.entetys
 
         }
         public override char Species { get; set; } = 'Q';
-        public override string Symbol { get; set; } = "[Q]";
+        
         public int gestationperiod { get; set; } = 19;
         public int EggGracePeriod { get; set; } = 100;
 

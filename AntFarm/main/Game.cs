@@ -592,7 +592,7 @@ namespace AntFarm.main
                             continue;
                         }
 
-                        // Move the ant: remove from old cell add to new cell update position
+                        // Move the ant remove from old cell add to new cell update position
                         var oldPos = ant.Position;
                         int oldX = oldPos.Item1;
                         int oldY = oldPos.Item2;
@@ -1195,7 +1195,7 @@ namespace AntFarm.main
                 ant.food--;
                 if (ant.food <= 0)
                 {
-                    // remove ant from grid
+                    // remove ant from grid cos it died of hunger
                     var pos = ant.Position;
                     var cell = grid.GetCellAtLocation(pos.Item1, pos.Item2);
                     cell.RemoveEntity(ant);
@@ -1273,7 +1273,7 @@ namespace AntFarm.main
 
 
         
-        public void antwander(Ant ant)
+        public void antwander(Ant ant) // picks random pos in the "air zone" (for simplicity) ant walks their but claimed task still =-1 so they can be reassigned
         {
             if (queue1.tasks.Count < GetAllAnts().Count && ant.clamedtaskid == -1)
             {
@@ -1283,21 +1283,18 @@ namespace AntFarm.main
                 algorithm.Task wander = new algorithm.Task(queue1.lasttaskid++, "wander", (x, y));
                 ant.Currenttask = wander;
                 ant.clamedtaskid = -1;
-            }
+            } 
         }
-        /*
-         * Algorithm :
-         * find closest ant to end position that doesnt already have a task 
-         * work out path to end position
-         * send and to end position 
-         *  starting point will be the end goal eg food then djikstas from there to find the closest ant and then resverse path and get ant to follow it 
-         */
+
+
+
+        
         public void ClosestAnt(algorithm.Task task)
         {
-            // Build list of candidate ants:
+            // list of candidate ants
             // - ants with no claimed task
-            // - ants currently doing "farmwork" (we allow them to be considered, but we will only remove their farm reservation
-            //   if they are the chosen ant)
+            // - ants currently doing "farmwork" (we allow them to be considered but we will only remove their farm reservation if they are the chosen one)
+          
             List<Ant> candidates = new List<Ant>();
             for (int x = 0; x < grid.width; x++)
             {
@@ -1315,7 +1312,7 @@ namespace AntFarm.main
                             else if (a.Currenttask != null && string.Equals(a.Currenttask.tasktype, "farmwork", StringComparison.OrdinalIgnoreCase))
                             {
                                 // Check the farm the ant is assigned to and only include the ant if
-                                // the farm reports the ant has been working there for at least 30 ticks.
+                                // the farm reports the ant has been working there for at least 30 ticks so they have the possibility of being reassigned
                                 var farmPos = a.Currenttask.targetposition;
                                 if (grid.IsInGridRange(farmPos.Item1, farmPos.Item2))
                                 {
@@ -1358,7 +1355,7 @@ namespace AntFarm.main
                 throw new Exception("no ants cn task");
             }
 
-            // If the chosen ant is currently farming, release its farm reservation now (only because it was chosen).
+            // If the chosen ant is currently farming release its farm reservation now (only because it was chosen).
             if (closestant.Currenttask != null && string.Equals(closestant.Currenttask.tasktype, "farmwork", StringComparison.OrdinalIgnoreCase))
             {
                 var oldPos = closestant.Currenttask.targetposition;
@@ -1383,9 +1380,9 @@ namespace AntFarm.main
             // Assign the new task
             closestant.Currenttask = task;
             closestant.clamedtaskid = task.id;
-            closestant.path = null; // force recompute on next tick
+            closestant.path = null;
 
-            // Special handling if we just assigned a farmwork task: reserve the farm and remove queued duplicates
+            // Special handling if we just assigned a farmwork task reserve the farm and remove queued duplicates
             if (string.Equals(task.tasktype, "farmwork", StringComparison.OrdinalIgnoreCase))
             {
                 if (grid.IsInGridRange(goalX, goalY))
@@ -1405,7 +1402,8 @@ namespace AntFarm.main
         // methord to find closes food thing (store or just food) to ant
         public void ClosestFoodWtaskadd(Ant ant)
         {
-            // 1. Try to find the closest FoodStore with food
+            // ants go to food stored b4 they try farm food if not then natural food 
+            
             List<FoodStore> foodStores = new List<FoodStore>();
             for (int x = 0; x < grid.width; x++)
             {
@@ -1444,7 +1442,7 @@ namespace AntFarm.main
                 }
             }
 
-            // --- NEW REPLACEMENT: 2. If no FoodStore with food, try to find the closest Farm with food ---
+            //  If no FoodStore with food try to find the closest Farm with food 
             List<farm> foodFarms = new List<farm>();
             for (int x = 0; x < grid.width; x++)
             {
@@ -1482,9 +1480,9 @@ namespace AntFarm.main
                     return;
                 }
             }
-            // ------------------------------------------------------------------------------------------
+            
 
-            // 3. (Previously 2) If no FoodStore and no Farm with food, fall back to closest natural Food entity
+            // 3 If no FoodStore and no Farm with food fall back to closest natural Food entity
             List<Food> foodnat = new List<Food>();
             for (int x = 0; x < grid.width; x++)
             {
@@ -1500,12 +1498,7 @@ namespace AntFarm.main
                     }
                 }
             }
-            /*
-            if (foodnat.Count == 0)
-            {
-                throw new Exception("no food found");
-            }
-            */
+           
             int closestdistance2 = int.MaxValue;
             Food closestfood = null;
             foreach (var food in foodnat)
@@ -1524,10 +1517,7 @@ namespace AntFarm.main
                 ant.Currenttask = foodtask;
                 ant.clamedtaskid = foodtask.id;
             }
-            //else
-            //{
-                //throw new Exception("no food found");
-            //}
+            
         }
         public void pathfind(Ant ant)
         {
@@ -1535,7 +1525,7 @@ namespace AntFarm.main
             // check if start and end are the same
             // check area around ant to see if its full boxed
             // if any of these then thwrow exception
-            // implement djikstras algorithm
+           
 
             // return path into ant path list then ant moves along it each tick
             if (ant == null) throw new ArgumentNullException(nameof(ant));
@@ -1558,7 +1548,7 @@ namespace AntFarm.main
             int goalX = endX;
             int goalY = endY;
 
-            // if goal cell ismnt traversable find closest adjacent traversable cell (will have to add doubble check for doubble landlocked)
+            // if goal cell ismnt traversable find closest adjacent traversable cell 
             var goalCell = grid.GetCellAtLocation(endX, endY);
             if (!goalCell.IsTraversable)
             {
@@ -1578,7 +1568,7 @@ namespace AntFarm.main
                     if (!nc.IsTraversable) continue;
                     if (nc.IsTraversable)
                     {
-                        // use manhattan distance to find closest (dm cos canot move diagonally)    
+                        // use manhattan distance to find closest (dm cos canot move diagonally) (ts is the heuristc)    
                         int manhattan = Math.Abs(nx - startX) + Math.Abs(ny - startY);
                         if (manhattan < bestDist)
                         {
@@ -1589,13 +1579,13 @@ namespace AntFarm.main
                 }
                 if (best.HasValue)
                 {
-                    // set the goal to the chosen cell to get to (for food it its the cell for dig....)
+                    // set the goal to the chosen cell to get to (for food it its the cell for dig cell next to it)
                     goalX = best.Value.x;
                     goalY = best.Value.y;
                 }
                 else
                 {
-                    // could add more here to add extra digs to get to a point or stop player from doing it 
+                    
                     throw new InvalidOperationException("No reachable traversable cell adjacent to target.");
                 }
             }
@@ -1605,10 +1595,10 @@ namespace AntFarm.main
             // If already at goal empty path
             if (startX == goalX && startY == goalY)
             {
-                ant.path = new List<int>(); // already there
+                ant.path = new List<int>(); 
                 return;
             }
-            // n is area of grid
+            
             int n = GridWidth * GridHeight;
             var dist = new int[n];
             var parent = new int[n];

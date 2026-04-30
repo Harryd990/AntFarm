@@ -8,12 +8,13 @@ namespace AntFarm
 {
     internal class stone :Dirt
     {
+        // stone is just harder dirt
         public stone(int x, int y) : base(x, y)
         {
         }
         
         public override int hardness { get; set; } = 15;
-        public override string Symbol => "[$]";
+       
         
 
     }

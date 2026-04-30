@@ -12,7 +12,7 @@ namespace AntFarm.entetys
         public Egg(int id, char Species) : base(id, Species) { }
                 public override int Id { get; set; }
         public override char Species { get; set; } = 'E';
-        public override string Symbol { get; set; } = "[E]";
+        
 
         public int hatchTime { get; set; } = 20;
         public void HatchEgg(Game game)

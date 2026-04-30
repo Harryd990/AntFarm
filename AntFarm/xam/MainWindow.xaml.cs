@@ -25,7 +25,7 @@ namespace AntFarm
             InitializeComponent();
             _game = game;
             
-            // Fix: Only run initialization if this is a fresh start (0 ticks progressed)
+            // Only run initialization if this is a fresh start (0 ticks progressed)
             if (_game.tick == 0 && _game.totalAntsEver == 0)
             {
                 _game.Initialise_Game();
@@ -33,18 +33,18 @@ namespace AntFarm
             
             _game.OnSimulationLog += OnGameLogMessage; 
 
-            // 1. Initialize the UI Timer
+            // Initialize the UI Timer
             _simTimer = new DispatcherTimer();
             _simTimer.Tick += SimTimer_Tick;
 
-            // 2. Initial rendering
+            //  Initial rendering
             MainCanvas.Loaded += (s, e) => GridRenderer.Render(_game, MainCanvas);
             MainCanvas.SizeChanged += (s, e) => GridRenderer.Render(_game, MainCanvas);
 
-            // 3. Hook up the Speed Slider
+            // Hook up the Speed Slider
             SpeedSlider.ValueChanged += SpeedSlider_ValueChanged;
 
-            // 4. Hook up KeyDown for slider manipulation
+            //  Hook up KeyDown for slider manipulation
             this.KeyDown += MainWindow_KeyDown;
 
             UpdatesText.Text = _currentStatus;
@@ -72,7 +72,7 @@ namespace AntFarm
 
         private void RefreshUpdatesText()
         {
-            // Removed extra linebreaks so logs appear exactly underneath the stats line
+            
             if (_actionLogs.Count > 0)
             {
                 UpdatesText.Text = $"{_currentStatus}\n" + string.Join("\n", _actionLogs);
@@ -145,7 +145,8 @@ namespace AntFarm
             panelToShow.Visibility = Visibility.Visible;
         }
 
-        // Use this before starting any new tool sequence
+
+        // used before starting any new tool sequence
         private void CancelActiveTool()
         {
             if (_cancelCurrentSelection != null)
@@ -165,21 +166,21 @@ namespace AntFarm
             {
                 var (gridX, gridY) = canvasCellSelect();
 
-                // If the user right-clicked, the result is (-1, -1), so we break out of the loop
+                // If the user right clicked result is (-1, -1) break loop
                 if (gridX == -1 || gridY == -1)
                 {
                     OnGameLogMessage("Exited Build farm Tool");
                     break;
                 }
 
-                // Check if the cell is underground & open, and doesn't overlap an existing building/food
+                // Check if the cell is underground + open and doesnt overlap an existing building/food
                 if (_game.OverGAndOpen((gridX, gridY), _game.GridHeight))
                 {
                     AntFarm.algorithm.Task buildtask = new AntFarm.algorithm.Task(_game.queue1.lasttaskid++, "buildfarm", (gridX, gridY));
                     _game.queue1.addtask(buildtask);
                     OnGameLogMessage($"Queued build farm     task at ({gridX}, {gridY})");
 
-                    // Ensure visual update right away
+                    
                     GridRenderer.Render(_game, MainCanvas);
                 }
                 else
@@ -197,21 +198,21 @@ namespace AntFarm
             {
                 var (gridX, gridY) = canvasCellSelect();
                 
-                // If the user right-clicked, the result is (-1, -1), so we break out of the loop
+                
                 if (gridX == -1 || gridY == -1) 
                 {
                     OnGameLogMessage("Exited Build Food Store Tool");
                     break;
                 }
 
-                // Check if the cell is underground & open, and doesn't overlap an existing building/food
+                
                 if (_game.UnderGAndopen((gridX, gridY), _game.GridHeight))
                 {
                     AntFarm.algorithm.Task buildtask = new AntFarm.algorithm.Task(_game.queue1.lasttaskid++, "buildfoodstore", (gridX, gridY));
                     _game.queue1.addtask(buildtask);
                     OnGameLogMessage($"Queued build food store task at ({gridX}, {gridY})");
                     
-                    // Ensure visual update right away
+                   
                     GridRenderer.Render(_game, MainCanvas);
                 }
                 else
@@ -223,14 +224,14 @@ namespace AntFarm
         
          private void Dig_Click(object sender, RoutedEventArgs e)
         {
-            // Cancel any old tool first
+            
             CancelActiveTool();
 
             while (true)
             {
                 var (gridX, gridY) = canvasCellSelect();
                 
-                // If the user right-clicked, the result is (-1, -1), so we break out of the loop
+                
                 if (gridX == -1 || gridY == -1) 
                 {
                     OnGameLogMessage("Exited Dig Tool");
@@ -246,7 +247,7 @@ namespace AntFarm
                     _game.queue1.addtask(digtask);
                     OnGameLogMessage($"Queued dig task at ({gridX}, {gridY})");
                     
-                    // Ensure visual update right away
+                    
                     GridRenderer.Render(_game, MainCanvas);
                 }
                 else
@@ -269,7 +270,7 @@ namespace AntFarm
             // Cancel active tools when settings are opened
             CancelActiveTool();
 
-            // Create a small custom popup window in code
+            //  popup window
             Window inputWindow = new Window
             {
                 Title = "Ideal Population",
@@ -323,7 +324,7 @@ namespace AntFarm
             SpeedSlider.Value = 0;
             CancelActiveTool();
 
-            // Create a custom popup window in code
+            // popup window
             Window inputWindow = new Window
             {
                 Title = "Save Game",
@@ -337,7 +338,7 @@ namespace AntFarm
             StackPanel panel = new StackPanel { Margin = new Thickness(15) };
             panel.Children.Add(new TextBlock { Text = "Enter a name for your save file:", Margin = new Thickness(0, 0, 0, 10) });
 
-            // Ensure the filename is safe by replacing invalid characters like ':' and '/'
+            
             string defaultName = $"Antfarm_{DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss")}";
             TextBox textBox = new TextBox { Text = defaultName, Padding = new Thickness(2) };
             panel.Children.Add(textBox);
@@ -347,13 +348,13 @@ namespace AntFarm
             {
                 string filename = textBox.Text.Trim();
                 
-                // Add the .json extension if they didn't type it
+                //  the .json extension if they didnt type it
                 if (!filename.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
                 {
                     filename += ".json";
                 }
 
-                // Call your save manager
+                // Cal save manager
                 var saver = new AntFarm.Saving.SaveManager();
                 saver.SaveGame(_game, filename);
 
@@ -374,26 +375,26 @@ namespace AntFarm
         {
             if (_game == null) return;
 
-            // Get the list of strings from your Game.statistics() method
+            // Get the list of strings from Game.statistics()
             var statsList = _game.statistics();
 
-            // Join them together with line breaks
+            
             string statsMsg = string.Join("\n", statsList);
 
-            // Pop up the message box
+            // Pop  message box
             MessageBox.Show(statsMsg, "Current Game Statistics", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         // Dev Tools
         private void SpawnEntity_Click(object sender, RoutedEventArgs e)
         {
-            // Pause the simulation
+            
             SpeedSlider.Value = 0;
 
-            // Cancel any old tool first
+            
             CancelActiveTool();
 
-            // -- Phase 1: Select Entity Type --
+            // Select Entity Type 
             string selectedType = null;
 
             Window selectWindow = new Window
@@ -435,11 +436,11 @@ namespace AntFarm
             selectWindow.Content = selectPanel;
             selectWindow.ShowDialog();
 
-            if (selectedType == null) return; // User closed the window
+            if (selectedType == null) return; 
 
-            // -- Phase 2: Configure the template properties --
+            // Configure the template properties 
             
-            // Temporary storage for our configured settings
+            // Temporary storage for configured settings
             int configAge = 0;
             int configFoodLevel = 100;
             int configFoodAmount = 50;
@@ -519,12 +520,12 @@ namespace AntFarm
 
             OnGameLogMessage($"Spawn tool activated for: {selectedType}. Click to spawn, Right-click to exit.");
 
-            // -- Phase 3: Spawning Loop --
+            // Spawning Loop
             while (true)
             {
                 var (gridX, gridY) = canvasCellSelect();
 
-                // Right click cancels the operation
+                
                 if (gridX == -1 || gridY == -1)
                 {
                     OnGameLogMessage("Exited Spawn Tool");
@@ -543,7 +544,7 @@ namespace AntFarm
                 // Generate new Entity ID
                 int newId = ++_game.lastEntityId;
 
-                // Instantiate and configure
+                // create and configure
                 if (selectedType == "Worker Ant")
                 {
                     var worker = new Worker(newId, 'A');
@@ -567,7 +568,7 @@ namespace AntFarm
                 {
                     
                     var food = new Food(newId, 0, 0); 
-                    food.Foodrange = (configFoodAmount, configFoodAmount); // Set min and max to the same for fixed amount
+                    food.Foodrange = (configFoodAmount, configFoodAmount); 
                     food.currentAmount = configFoodAmount;
                     food.virtFoodContained = configFoodAmount;
                     food.Position = (gridX, gridY);
@@ -602,17 +603,17 @@ namespace AntFarm
         }
         private void GetCellDetails_Click(object sender, RoutedEventArgs e)
         {
-            // Pause the simulation so cell details don't change while inspecting
+            
             SpeedSlider.Value = 0;
 
-            // Cancel any old tool first
+            
             CancelActiveTool();
 
             while (true)
             {
                 var (gridX, gridY) = canvasCellSelect();
 
-                // If the user right-clicked, the result is (-1, -1), so we break out of the loop
+               
                 if (gridX == -1 || gridY == -1)
                 {
                     OnGameLogMessage("Exited Get Cell Details Tool");
@@ -655,23 +656,23 @@ namespace AntFarm
                     }
                 }
 
-                // Show the details in a message box so it's easy to read
+                // Show the details in message box 
                 MessageBox.Show(string.Join("\n", details), "Cell Details", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
         private void EditEntity_Click(object sender, RoutedEventArgs e)
         {
-            // Pause the simulation
+           
             SpeedSlider.Value = 0;
 
-            // Cancel any old tool first
+            
             CancelActiveTool();
 
             while (true)
             {
                 var (gridX, gridY) = canvasCellSelect();
 
-                // If the user right-clicked, the result is (-1, -1), cancel tool
+                
                 if (gridX == -1 || gridY == -1)
                 {
                     OnGameLogMessage("Exited Edit Entity Tool");
@@ -683,12 +684,12 @@ namespace AntFarm
                 if (cell.Entities.Count == 0)
                 {
                     OnGameLogMessage($"No entities found to edit at ({gridX}, {gridY}).");
-                    continue; // Keep letting the user click
+                    continue; 
                 }
 
                 Entity selectedEntity = null;
 
-                // Custom window to select which entity to edit
+                //window to select which entity to edit
                 Window selectWindow = new Window
                 {
                     Title = "Select Entity",
@@ -727,7 +728,7 @@ namespace AntFarm
                 selectWindow.Content = selectPanel;
                 selectWindow.ShowDialog();
 
-                // If the user selected an entity and clicked continue, show the proper edit window
+                // If the user selected an entity and clicked continue show edit window
                 if (selectedEntity != null)
                 {
                     ShowEditEntityDetailsWindow(selectedEntity);
@@ -750,7 +751,7 @@ namespace AntFarm
             StackPanel panel = new StackPanel { Margin = new Thickness(15) };
 
             // Dictionary to hold functions for applying changes back to the properties 
-            // Key: Property name, Value: (Setter action, TextBox containing new value)
+            // Key: Property name, Value: ( TextBox containing new value)
             var intPropertiesToSave = new Dictionary<string, (Action<int>, TextBox)>();
 
             void AddEditableIntProperty(string propName, int startValue, Action<int> setter)
@@ -823,7 +824,7 @@ namespace AntFarm
             _actionLogs.Add(logLine);
             RefreshUpdatesText();
 
-            // Remove this specific line after 5 seconds automatically
+            // remove stuff after 5 secs
             System.Threading.Tasks.Task.Run(async () =>
             {
                 await System.Threading.Tasks.Task.Delay(2000);
@@ -852,14 +853,14 @@ namespace AntFarm
 
                 if (Devmode == true)
                 {
-                    // This removes all entities in the cell (ants, all types of food and buildings)
+                    // This removes all entities in the cell (ants all types of food and buildings)
                     var entitiesToRemove = cell.Entities.ToList();
                     foreach (var entity in entitiesToRemove)
                     {
                         cell.RemoveEntity(entity);
                     }
 
-                    // If below ground, turn it into dirt
+                    // If below groun turn it into dirt
                     if (gridY >= _game.GridHeight / 4)
                     {
                         _game.ReplaceCellAtLocation(gridX, gridY, new Dirt(gridX, gridY));
@@ -869,7 +870,7 @@ namespace AntFarm
                 }
                 else
                 {
-                    // This should just remove farms and food stores
+                    //  remove farms and food stores
                     var farmEntity = cell.Entities.OfType<farm>().FirstOrDefault();
                     if (farmEntity != null)
                     {
@@ -896,6 +897,7 @@ namespace AntFarm
             }
         }
         
+        // this is used in all inputs where user cliks on grid
         public (int, int) canvasCellSelect()
         {
             var frame = new DispatcherFrame();
@@ -904,7 +906,7 @@ namespace AntFarm
             System.Windows.Input.MouseButtonEventHandler clickHandler = null;
             System.Windows.Input.MouseButtonEventHandler rightClickHandler = null;
             
-            // Add a red border using a WPF Adorner so the GridRenderer clearing the canvas doesn't wipe it
+            // Add a red border so player knows when they r inputing so the GridRenderer clearing the canvas doesnt wipe it
             System.Windows.Documents.AdornerLayer adornerLayer = System.Windows.Documents.AdornerLayer.GetAdornerLayer(MainCanvas);
             CanvasBorderAdorner redBorder = null;
             if (adornerLayer != null)
@@ -921,7 +923,7 @@ namespace AntFarm
                 _cancelCurrentSelection = null;
             }
 
-            // Let the UI button click force this nested loop to yield (-1, -1) and break early
+           
             _cancelCurrentSelection = () =>
             {
                 result = (-1, -1);
@@ -929,7 +931,7 @@ namespace AntFarm
                 frame.Continue = false;
             };
 
-            // Define the logic when a left-click happens
+           
             clickHandler = (s, e) =>
             {
                 Point clickPos = e.GetPosition(MainCanvas);
@@ -950,7 +952,7 @@ namespace AntFarm
                 frame.Continue = false;
             };
 
-            // Define the logic when right-click happens to cancel
+            
             rightClickHandler = (s, e) =>
             {
                 result = (-1, -1);
@@ -958,40 +960,41 @@ namespace AntFarm
                 frame.Continue = false;
             };
 
-            // Hook them up to "Preview" (Tunneling) events so high tick speed rendering clears don't steal the event
+            
             MainCanvas.PreviewMouseLeftButtonDown += clickHandler;
             MainCanvas.PreviewMouseRightButtonDown += rightClickHandler;
 
-            // This freezes execution of this method without crashing the UI window entirely
+            
             Dispatcher.PushFrame(frame);
 
             return result;
         }
 
+        // lets user use the right and left arrow keys to change speed
         private void MainWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
-            // Decrease speed logic (towards 0 or paused)
+            
             if (e.Key == System.Windows.Input.Key.Left)
             {
                 if (SpeedSlider.Value > SpeedSlider.Minimum)
                 {
-                    // Step down by exactly 1
+                    
                     SpeedSlider.Value -= 1;
                 }
             }
-            // Increase speed logic (towards maximum allowed)
+            
             else if (e.Key == System.Windows.Input.Key.Right)
             {
                 if (SpeedSlider.Value < SpeedSlider.Maximum)
                 {
-                    // Step up by exactly 1
+                    
                     SpeedSlider.Value += 1;
                 }
             }
         }
     }
 
-    // Helper class to draw a border over the Canvas independently of cell children
+    //class to draw a border over the Canvas independently of cell children
     public class CanvasBorderAdorner : System.Windows.Documents.Adorner
     {
         public CanvasBorderAdorner(UIElement adornedElement) : base(adornedElement) { }

@@ -12,7 +12,7 @@ namespace AntFarm
     {
         Random random = new Random();
 
-        // properties
+        
         public int width {  get; private set; }
         public int height { get; private set; }
         private Cell[,] cells;
@@ -77,7 +77,7 @@ namespace AntFarm
         }
         public bool IsInGridRange(int x, int y)
         {
-            //check if x,y is in range
+          
             return !((x < 0 || y < 0) || (x >= width || y >= height));
    
         }

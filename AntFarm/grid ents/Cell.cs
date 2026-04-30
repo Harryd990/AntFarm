@@ -12,7 +12,7 @@ namespace AntFarm
         public int X { get; set; }
         public int Y { get; set; }
         public abstract bool IsTraversable { get; }
-        public abstract string Symbol { get; }
+        
 
 
         public List<Entity> Entities { get; } = new List<Entity>();

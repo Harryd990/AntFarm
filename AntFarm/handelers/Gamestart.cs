@@ -30,48 +30,47 @@ namespace AntFarm.handelers
         {
             try
             {
-                // 1. Check if the file actually exists
+                //  Check if the file actually exists
                 if (!File.Exists(filePath))
                 {
                     return (null, false);
                 }
 
-                // 2. Read the JSON text to deserialize into GameSave directly to test validity
+                // Read the JSON text to deserialize into GameSave directly to test validity
                 string jsonText = File.ReadAllText(filePath);
 
-                // Allow polymorphism deserialization (same as saving logic)
+                
                 var jsonOptions = new JsonSerializerOptions { WriteIndented = true };
                 GameSave? savedData = JsonSerializer.Deserialize<GameSave>(jsonText, jsonOptions);
 
-                // 3. Null check
+                // Null check
                 if (savedData == null)
                 {
                     return (null, false);
                 }
 
-                // --------- Basic Corruption Checks --------- //
+                //Basic Corruption Checks 
 
-                // Check A: Dimensions must be positive integers
+                // Dimensions must be positive integers
                 if (savedData.width <= 0 || savedData.height <= 0)
                 {
                     return (null, false);
                 }
 
-                // Check B: The number of saved cells must exactly match the defined grid matrix (width * height)
-                // This checks if the cell list is corrupted, malformed, missing, or expanded.
+                //  The number of saved cells must exactly match the defined grid matrix (width * height)
                 int expectedCells = savedData.width * savedData.height;
                 if (savedData.Cell == null || savedData.Cell.Count != expectedCells)
                 {
                     return (null, false);
                 }
 
-                // Check C: Negative Tick value (Time doesn't go backwards)
+                // Check C: Negative Tick value 
                 if (savedData.tick < 0)
                 {
                     return (null, false);
                 }
 
-                // IF ALL CHECKS PASS: Create the Game object from the tested Save
+                // Create the Game object from the tested Save
                 var saveManager = new SaveManager();
                
                 Game loadedGame = saveManager.LoadGame(filePath);

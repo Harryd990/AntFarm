@@ -13,7 +13,7 @@ namespace AntFarm.entetys
 
         }
         public override char Species { get; set; } = 'A';
-        public override string Symbol { get; set; } = "[A]";
+       
 
         
        

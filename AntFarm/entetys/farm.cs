@@ -11,12 +11,8 @@ namespace AntFarm.entetys
         public farm(int id, char Species) : base(id, Species) { }
         public override int Id { get; set; }
         public override char Species { get; set; } = 'R';
-        public override string Symbol { get; set; } = "[R]";
-        // farm generates food over time every 10 ticks 100 food is made costs 10 food to create a farm
-        // chane gathe foods to sore thing to haul food so can be used on farms too 
-        // ant needs to work in farm for it t make food ( farm makes enough food for 10 ants)
-
-        // add virtual food contained (so tasks can claim food from farm without doubbeling up)
+        
+       
 
         public int virtFoodContained { get; set; } = 0;
         public int FoodContained { get; set; } = 0;

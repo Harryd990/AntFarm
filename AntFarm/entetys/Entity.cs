@@ -11,7 +11,7 @@ namespace AntFarm.entetys
         public abstract int Id { get; set; }
         public abstract char Species { get; set; }
 
-        public abstract string Symbol { get; set; }
+        
 
         public virtual (int,int) Position{ get; set; }
 

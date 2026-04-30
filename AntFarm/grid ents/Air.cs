@@ -16,10 +16,8 @@ namespace AntFarm
        
         public override bool IsTraversable => true;
 
-        // check if there is any entity in the cell if ther is then show that entitys symbol 
-        public override string Symbol => Entities.Count > 0
-            ? $"[{Entities[0].Species}]"
-            : "[ ]";
+        
+        
     }
 
 }
