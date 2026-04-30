@@ -62,26 +62,50 @@
 
                             <!-- Create and Destroy options -->
                             <StackPanel x:Name="PanelCreateDestroy" Visibility="Collapsed">
-                                <Button Content="Build Farm" Click="BuildFarm_Click" Background="White"/>
-                                <Button Content="Build Food Store" Click="BuildFoodStore_Click" Background="White"/>
-                                <Button Content="Dig" Click="Dig_Click" Background="White"/>
-                                <Button Content="Remove Building" Click="RemoveBuilding_Click" Background="White"/>
+                                <Button Content="Build Farm" Click="BuildFarm_Click" Background="White" 
+                                        ToolTip="Construct a new farm building to generate food for your colony (this can only be done above ground)"
+                                        ToolTipService.InitialShowDelay="1000"/>
+                                <Button Content="Build Food Store" Click="BuildFoodStore_Click" Background="White" 
+                                        ToolTip="Create a food storage bulding for your ants to store food in (this can only be done bellow ground)"
+                                        ToolTipService.InitialShowDelay="1000"/>
+                                <Button Content="Dig" Click="Dig_Click" Background="White" 
+                                        ToolTip="Input locations for ants to dig out"
+                                        ToolTipService.InitialShowDelay="1000"/>
+                                <Button Content="Remove Building" Click="RemoveBuilding_Click" Background="White" 
+                                        ToolTip="Demolish an existing farm, food store, or other built structure."
+                                        ToolTipService.InitialShowDelay="1000"/>
                             </StackPanel>
 
                             <!-- Settings options -->
                             <StackPanel x:Name="PanelSettings" Visibility="Collapsed">
-                                <Button Content="Ideal Population" Click="IdealPop_Click" Background="White"/>
-                                <Button Content="New Game" Click="NewGame_Click" Background="White"/>
-                                <Button Content="Save Game" Click="SaveGame_Click" Background="White"/>
-                                <Button Content="Get Statistics" Click="GetStats_Click" Background="White"/>
+                                <Button Content="Ideal Population" Click="IdealPop_Click" Background="White" 
+                                        ToolTip="Adjust the target number of ants the queen should try to create."
+                                        ToolTipService.InitialShowDelay="1000"/>
+                                <Button Content="New Game" Click="NewGame_Click" Background="White" 
+                                        ToolTip="Abandon the current simulation and return to the startup screen."
+                                        ToolTipService.InitialShowDelay="1000"/>
+                                <Button Content="Save Game" Click="SaveGame_Click" Background="White" 
+                                        ToolTip="Save your current colony progress to a file."
+                                        ToolTipService.InitialShowDelay="1000"/>
+                                <Button Content="Get Statistics" Click="GetStats_Click" Background="White" 
+                                        ToolTip="View data such as current ant population, food reserves, and average worker lifespan."
+                                        ToolTipService.InitialShowDelay="1000"/>
                             </StackPanel>
 
                             <!-- Dev Tools options -->
                             <StackPanel x:Name="PanelDevTools" Visibility="Collapsed">
-                                <Button Content="Spawn Entity" Click="SpawnEntity_Click" Background="White"/>
-                                <Button Content="Clear Cell" Click="ClearCell_Click" Background="White"/>
-                                <Button Content="Get Cell Details" Click="GetCellDetails_Click" Background="White"/>
-                                <Button Content="Edit Entity Details" Click="EditEntity_Click" Background="White"/>
+                                <Button Content="Spawn Entity" Click="SpawnEntity_Click" Background="White" 
+                                        ToolTip="Instantly spawn an ant, food node, or other entity for testing."
+                                        ToolTipService.InitialShowDelay="1000"/>
+                                <Button Content="Clear Cell" Click="ClearCell_Click" Background="White" 
+                                        ToolTip="Force a specific cell to revert to original state (underground this will make it dirt and above air) and remove all ants and buildings"
+                                        ToolTipService.InitialShowDelay="1000"/>
+                                <Button Content="Get Cell Details" Click="GetCellDetails_Click" Background="White" 
+                                        ToolTip="Inspect cell details such as contained entities (their details) and cell type"
+                                        ToolTipService.InitialShowDelay="1000"/>
+                                <Button Content="Edit Entity Details" Click="EditEntity_Click" Background="White" 
+                                        ToolTip="Modify entitys details"
+                                        ToolTipService.InitialShowDelay="1000"/>
                             </StackPanel>
 
                         </StackPanel>
@@ -128,7 +152,6 @@
                             SmallChange="0.5"
                             LargeChange="1"
                             TickPlacement="TopLeft"
-                            ToolTip="Simulation speed multiplier"
                             HorizontalAlignment="Center"/>
 
 

@@ -14,7 +14,7 @@ namespace AntFarm
     {
         private Game _game;
         private DispatcherTimer _simTimer;
-        private string _currentStatus = "Simulation ready.";
+        private string _currentStatus = "Welcome to the Ant Farm simulation! the game begins paused (adjust speed slider to begin)";
         private List<string> _actionLogs = new List<string>();
 
         // Action delegate to cancel the currently active canvas selection
@@ -46,6 +46,28 @@ namespace AntFarm
 
             // 4. Hook up KeyDown for slider manipulation
             this.KeyDown += MainWindow_KeyDown;
+
+            UpdatesText.Text = _currentStatus;
+
+            // Add the Loaded event for our popup
+            this.Loaded += MainWindow_Loaded;
+        }
+
+        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+           
+            MessageBoxResult result = MessageBox.Show(
+                "have you played this game before", 
+                "Tutorial", 
+                MessageBoxButton.YesNo, 
+                MessageBoxImage.Question);
+
+            
+            if (result == MessageBoxResult.No)
+            {
+                Window1 tutorialWindow = new Window1();
+                tutorialWindow.Show();
+            }
         }
 
         private void RefreshUpdatesText()
