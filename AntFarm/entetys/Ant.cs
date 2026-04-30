@@ -31,32 +31,24 @@ namespace AntFarm.entetys
 
         public virtual int carryingcapacity { get; set; } = 1000;
         public virtual int foodcarried { get; set; } = 0;
-        /*
-         * commented cos adding food carryied cos idk what else they carry yet
-        public virtual List<int> inventory { get; set; } = new List<int>();
-        */
+       
 
         public virtual List<int> path { get; set; } = new List<int>();
-        // loop through each position in path and move ant there
-
-        // add it so ants loose food after every tick 
-        // --- Added for foodstoregather two-stage task ---
-        // The food store position we ultimately must deliver to (set when task assigned)
+       
         public (int, int)? FoodStoreTarget { get; set; } = null;
 
-        // True while the ant is in the phase "go to food source and fill inventory"
+        
         public bool FillingFromSource { get; set; } = false;
 
 
-
-        // methord for ants to get food if they have less then 20 food (ungent food gather) 
-        public virtual void GatherFood(int amount)
+        public void Transferfood()
         {
-            food += amount;
-            if (food > maxfood)
-            {
-                food = maxfood;
-            }
+            int fdneedtotrans = 0;
+            fdneedtotrans = maxfood - food;
+            carryingcapacity = carryingcapacity - fdneedtotrans;
+            food = food + fdneedtotrans;
         }
+        
+        
     }
 }

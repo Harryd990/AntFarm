@@ -138,7 +138,7 @@ namespace AntFarm.main
 
         public void Initialise_Game()
         {
-            // adds queen to centre of grid on the first bit of air 
+            
             Random rand = new Random();
             queen = new Queen(0, 'Q');
             AddEntityToGameGrid(grid.width / 2, grid.height / 4 - 1, queen);
@@ -175,28 +175,25 @@ namespace AntFarm.main
             }
 
         }
-        // add print all tasks in queue for debuging
-        public void PrintAllTasksInQueue()
-        {
-            Console.WriteLine("Current Tasks in Queue:");
-            foreach (var task in queue1.tasks)
-            {
-                Console.WriteLine($"Task ID: {task.id}, Type: {task.tasktype}, Target Position: ({task.targetposition.Item1}, {task.targetposition.Item2})");
-            }
-        }
+        
         public void UgentHungerCheck() {List<Ant> ants = GetAllAnts();
             foreach (var ant in ants)
             {
-                if ((ant.food <= 40 && ant.clamedtaskid == -1) )
+                if (ant.food <= 42) // if ant is hungry and is carrying food shift that food from inventory to belly
+                    {
+                    ant.Transferfood();
+
+                    }
+                if ((ant.food <= 40 && ant.clamedtaskid == -1) ) // ant generates own task to get food if food is under 40 and dnt have task
                 {
-                    Console.WriteLine( "a ant hungers");
+                    
                     ClosestFoodWtaskadd(ant);
                 }
                 
-                if(ant.food <= 20 && ant.clamedtaskid != -1 && ant.Currenttask.tasktype != "gatherfood")
+                if(ant.food <= 20 && ant.clamedtaskid != -1 && ant.Currenttask.tasktype != "gatherfood") // ant is famished cancel current task need scran now
                 {
                     Console.WriteLine("a ant hungers");
-                    // add current task back to queue
+                    
                     if (ant.Currenttask != null)
                     {
                         queue1.addtask(ant.Currenttask);
@@ -222,6 +219,7 @@ namespace AntFarm.main
             if (queen != null)
 
             {
+                // if queen has 60 food and isnt already making babyes and current population is less then the ideal number queen makes egg
                 if (checkforUnderGroundSpace() && queen.retreting == false && queen.food >= 60 && queen.EggGracePeriod <= 0 && IdealPopulation > GetAllAnts().Count())
                 {
                     algorithm.Task queenTask = new algorithm.Task(queue1.lasttaskid++, "queenretrete", queen.Position);
@@ -252,10 +250,10 @@ namespace AntFarm.main
                 dirtcell.digprogress++;
                 if (dirtcell.digprogress >= dirtcell.hardness)
                 {
-                    // replace with air cell
+                    
                     ReplaceCellAtLocation(x, y, new Air(x, y));
                     totalDigsDone++;
-                    // Removed Console.Clear() and printgrid() to prevent crashes in WPF
+                    
                 }
             }
             else
@@ -311,7 +309,7 @@ namespace AntFarm.main
                     queen.FoodStoreTarget = newQueenWorker.FoodStoreTarget;
                     queen.FillingFromSource = newQueenWorker.FillingFromSource;
 
-                    // Fully replace in the grid so UI rendering picks up the new type
+                   
                     var cell = grid.GetCellAtLocation(newQueenWorker.Position.Item1, newQueenWorker.Position.Item2);
                     cell.RemoveEntity(newQueenWorker);
                     cell.AddEntity(queen);
@@ -325,7 +323,7 @@ namespace AntFarm.main
             }
             else
             {
-                // Make sure reference holds if a queen is alive
+                
                 queen = aliveQueen;
             }
         }
@@ -346,7 +344,7 @@ namespace AntFarm.main
                 }
             }
 
-            // Clear ant state consistently
+            
             ant.Currenttask = null;
             ant.clamedtaskid = -1;
             ant.path = null;
@@ -365,6 +363,12 @@ namespace AntFarm.main
             UpdateFarms();
             QueenPromotionCheck();
             
+            /* 
+             * decrease egg grace period 
+             * decrease egg time to hatch (if 0 hatch it)
+             * if food store isnt full create task to get it food
+             * tick farms (call over ant if no one is working if ant is working decrease time to harvest if time to harvest is 0 output food)
+             */
         }
         public void UpdateFarms()
         {

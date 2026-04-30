@@ -35,18 +35,14 @@ namespace AntFarm.algorithm
             }
         }
 
-        // NOTE: this method no longer mutates the ant (does not set ant.clamedtaskid).
-        // The caller should validate and then claim the task on the ant.
+       
         public Task getnexttask(Game game, Ant ant)
         {
-            /*
-             * Keep priority logic here if needed.
-             * Important: return the next task (and remove it from internal list) but do NOT modify the ant.
-             */
+           
 
             if (tasks.Count > 0)
             {
-                // Look for the first task that is reachable
+                
                 for (int i = 0; i < tasks.Count; i++)
                 {
                     Task t = tasks[i];
@@ -76,7 +72,7 @@ namespace AntFarm.algorithm
                         if (!isReachable) continue; 
                     }
 
-                    // Found a valid/reachable task! Remove and dispatch it.
+                    
                     tasks.RemoveAt(i);
                     return t;
                 }
@@ -91,5 +87,5 @@ namespace AntFarm.algorithm
         }
         
     }
-    // add priority queue for ant tasks but priorities should change dynamically based on colony state
+    
 }
