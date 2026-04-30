@@ -82,20 +82,7 @@ namespace AntFarm
    
         }
 
-        public string GetCellDetails(int x, int y)
-        {
-            string output = $"Cell {x},{y}\nCell Contents: \n";
-            foreach (Entity e in GetCellAtLocation(x, y).Entities)
-            {
-                output += $"ID : {e.Id} Species: {e.Species}";
-            }
-            return output;
-        }
        
-        public void ConvertToAir(int x, int y)
-        {
-            cells[x, y] = new Air(x, y);
-        }
         public void ReplaceCellAtLocation(int x, int y, Cell newCell)
         {
             var oldCell = cells[x, y];
