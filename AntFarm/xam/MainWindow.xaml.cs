@@ -565,8 +565,9 @@ namespace AntFarm
                 }
                 else if (selectedType == "Food")
                 {
-                    // Assuming Food constructor: `Food(int id, int currentAmount, int virtFoodContained)` based on typical usage in your game
+                    
                     var food = new Food(newId, 0, 0); 
+                    food.Foodrange = (configFoodAmount, configFoodAmount); // Set min and max to the same for fixed amount
                     food.currentAmount = configFoodAmount;
                     food.virtFoodContained = configFoodAmount;
                     food.Position = (gridX, gridY);

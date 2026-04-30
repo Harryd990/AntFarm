@@ -29,7 +29,7 @@ namespace AntFarm.entetys
 
         public virtual int age { get; set; } = 0;
 
-        public virtual int carryingcapacity { get; set; } = 1000;
+        public virtual int carryingcapacity { get; set; } = 5000;
         public virtual int foodcarried { get; set; } = 0;
        
 

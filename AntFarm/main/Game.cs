@@ -12,32 +12,11 @@ using System.Threading.Tasks;
 
 namespace AntFarm.main
 {
-    /*
-    add tool tips to all methods and properties
-    check on the start up window that it only counts the air space for the number of ants that can be added at the start and not the whole grid
-    in the remove food methord if the food store should it be carried or should it be in the ants belly maybe add somthing in ant so that it can transfer food carried to belly food if its lower then x 
-   fix the air display bug where it shows air as green when its under ground and on smaller grid sizes
-
-     * possible bugs
-     * - may need to add precidence to tasks as the farms are eating all my workers also should make it so queen doesnt work in farms
-     * - farms sorta kinda work
-     * - when u clear a cell it is in limbo between dug undug its desplayed as dirt but acts more like air 
-     * - prolly a whole lot of bugs wid edit and spawn entitys
-     * - you can do 2 build orders in the same spot making over lapping buildings etc which u shouldnt be able to do 
-     * - dig xs seem to diapeer after a fixed length of time which is starnge
-     * - make it so dig tasks can be queued anywhere
-     * - the farmwork task is being called multiple times 
-     * - ants maight not being assigned wander tasks enough
-     * - when innitalising with sliders you can add more ants then there is space in grid
-     * - air is somethings going green when undergound on smaller / none whole grid sizes
-     * - not sure ants are transfering food from farm to store properly
-     * when u edit food stores the ants wont eat from them?
-     * total food consumed not working
-     * */
+   
 
     public class Game
     {
-        // Add this line at the top of the Game class properties
+        
         public event Action<string> OnSimulationLog;
 
         public Grid grid;
@@ -49,7 +28,7 @@ namespace AntFarm.main
             grid = new Grid(width, height);
             queue1 = new queue();
             
-            // Remove the 'int' keyword here so it assigns to the class properties
+            
             StartingFodCount = startfood;
             startingAntCount = startants;
         }
@@ -192,7 +171,7 @@ namespace AntFarm.main
                 
                 if(ant.food <= 20 && ant.clamedtaskid != -1 && ant.Currenttask.tasktype != "gatherfood") // ant is famished cancel current task need scran now
                 {
-                    Console.WriteLine("a ant hungers");
+                    
                     
                     if (ant.Currenttask != null)
                     {
@@ -314,7 +293,7 @@ namespace AntFarm.main
                     cell.RemoveEntity(newQueenWorker);
                     cell.AddEntity(queen);
 
-                    Console.WriteLine($"A new queen has been promoted at ({newQueenWorker.Position.Item1},{newQueenWorker.Position.Item2})");
+                   
                 }
                 else
                 {
@@ -328,11 +307,11 @@ namespace AntFarm.main
             }
         }
 
-        private void UnassignTaskAndReleaseFarm(Ant ant)
+        private void UnassignTaskAndReleaseFarm(Ant ant) // if a ant is working on a farm for atlest 30 ticks and a new task (that isnt wander) comes up ant will do that task instead
         {
             if (ant == null) return;
 
-            // If the ant was assigned a farm task, clear the farm reservation
+            // If the ant was assigned a farm task clear the farm reservation
             if (ant.Currenttask != null && string.Equals(ant.Currenttask.tasktype, "farmwork", StringComparison.OrdinalIgnoreCase))
             {
                 var pos = ant.Currenttask.targetposition;
@@ -382,8 +361,22 @@ namespace AntFarm.main
                     foreach(var farm in farms)
                     {
                         farm.TickFarm();
-                        if (farm.antWorking == false && !queue1.tasks.Any(t => string.Equals(t.tasktype, "farmwork", StringComparison.OrdinalIgnoreCase)
-                            && t.targetposition == (x, y)))
+                        bool antAssigned = false;
+                        foreach (var ant in GetAllAnts())
+                        {
+                            if (ant.Currenttask != null &&
+                                string.Equals(ant.Currenttask.tasktype, "farmwork", StringComparison.OrdinalIgnoreCase) &&
+                                ant.Currenttask.targetposition == (x, y))
+                            {
+                                antAssigned = true;
+                                break;
+                            }
+                        }
+
+                        // Only add a farmwork task if no ant is assigned and no task is queued
+                        if (!farm.antWorking && !antAssigned &&
+                            !queue1.tasks.Any(t => string.Equals(t.tasktype, "farmwork", StringComparison.OrdinalIgnoreCase)
+                                && t.targetposition == (x, y)))
                         {
                             algorithm.Task foodstoretask = new algorithm.Task(queue1.lasttaskid++, "farmwork", (x, y));
                             queue1.addtask(foodstoretask);
@@ -455,7 +448,7 @@ namespace AntFarm.main
             if (y >= gridHeight / 4)
                 return false;
 
-            // Check if the cell is not dirt
+            // Check if the cell is not dirt (but this shoould never happen anyway)
             var cellType = GetCellType(coords.x, coords.y);
             if (cellType == "dirt")
                 return false;
@@ -464,30 +457,7 @@ namespace AntFarm.main
 
             return true;
         }
-        public (int,int) Fullinput4building()
-        {
-            // use both get cords and check4 super impose to get valid cords for building
-            while (true)
-            {
-                var cords = UserInputCords();
-                if (Check4superimpose(cords))
-                {
-                    if(UnderGAndopen(cords, grid.height))
-                    {
-                        return cords;
-                    }
-                    else
-                    {
-                        Console.WriteLine("You can only build underground and on non-dirt cells. Please choose different coordinates.");
-                    }
-
-                }
-                else
-                {
-                    Console.WriteLine("Cannot build here, there is already a valid entity in the way. Please choose different coordinates.");
-                }
-            }
-        }
+       
         public bool Check4superimpose((int,int) cords)
         {
             var cell = grid.GetCellAtLocation(cords.Item1, cords.Item2);
@@ -514,6 +484,8 @@ namespace AntFarm.main
             }
 
         }
+
+
         // egg hatch add up every tick untill = hatch time then add worker to grid at egg pos and remove egg from grid
         public void ProcessEggHatching()
         {
@@ -530,7 +502,7 @@ namespace AntFarm.main
                         {
                             egg.HatchEgg(this);
                             cell.RemoveEntity(egg);
-                            Console.WriteLine($"An egg has hatched at ({x},{y})");
+                            
                         }
                     }
                 }
@@ -542,7 +514,7 @@ namespace AntFarm.main
             var ants = GetAllAnts();
             foreach (var ant in ants)
             {
-                // Only assign a new task if the ant is idle (no current task OR no claimed id)
+                // Only assign a new task if the ant is idle (no current task OR no claimed id (these are almost the same thing but not with farmwork))
                 if (ant.Currenttask == null || ant.clamedtaskid == -1)
                 {
                     var task = queue1.getnexttask(this, ant);
@@ -560,7 +532,7 @@ namespace AntFarm.main
                         ant.Currenttask = task;
                         ant.clamedtaskid = task.id;
                         ant.path = null;
-                        // Note: getnexttask already removed the task from the queue list.
+                      
                     }
                 }
             }
@@ -597,14 +569,14 @@ namespace AntFarm.main
                         }
                     }
 
-                    // If there is a path, move one step per tick
+                    // If there is a path move one step per tick
                     if (!isDigAndAdjacent && ant.path != null && ant.path.Count > 0)
                     {
                         int nextIdx = ant.path[0];
                         int nextX = nextIdx % GridWidth;
                         int nextY = nextIdx / GridWidth;
 
-                        // If the next cell became blocked, try to re-path; if that fails, drop the task.
+                        // If the next cell became blocked (beacuse of cell clear) try to repath if that fails drop  task
                         var nextCell = grid.GetCellAtLocation(nextX, nextY);
                         if (!nextCell.IsTraversable)
                         {
@@ -620,7 +592,7 @@ namespace AntFarm.main
                             continue;
                         }
 
-                        // Move the ant: remove from old cell, add to new cell, update position
+                        // Move the ant: remove from old cell add to new cell update position
                         var oldPos = ant.Position;
                         int oldX = oldPos.Item1;
                         int oldY = oldPos.Item2;
@@ -632,7 +604,7 @@ namespace AntFarm.main
                         // remove the step ant took
                         ant.path.RemoveAt(0);
 
-                        // If we've reached the end of the path, attempt to work on the task (may start multi-tick dig)
+                        // ant reached the end of the path attempt to work on the task (may start multi-tick dig)
                         if (ant.path.Count == 0)
                         {
                             PerformTaskWork(ant);
@@ -640,19 +612,19 @@ namespace AntFarm.main
                     }
                     else
                     {
-                        // No movement to perform this tick (either because dig-and-adjacent or no path) — attempt work
+                        // No movement to perform this tick (either because dig-and-adjacent or no path) attempt work
                         PerformTaskWork(ant);
                     }
                 }
                 else
                 {
-                    // kinda redundant now (check the queue class)
+                    
                     antwander(ant);
                 }
             }
         }
 
-        // Helper: returns true if pos is same cell or cardinal neighbour of target
+        // returns true if pos is same cell or cardinal neighbour of target
         private static bool IsAdjacentOrOn((int, int) pos, (int, int) target)
         {
             int dx = Math.Abs(pos.Item1 - target.Item1);
@@ -660,11 +632,13 @@ namespace AntFarm.main
             return (dx + dy) <= 1;
         }
 
-        // Perform one tick of work for the ant's current task.
-        // Keeps the ant assigned for multi-tick tasks (dig) until the task is actually finished.
-        public void FillinvWfood(Ant ant)
-        {
+        
+        
+            public void FillinvWfood(Ant ant)
+            {
             var cell = grid.GetCellAtLocation(ant.Position.Item1, ant.Position.Item2);
+
+            // Try to pick up food from Food entity
             var foods = cell.Entities.OfType<Food>().ToList();
             foreach (var food in foods)
             {
@@ -686,7 +660,23 @@ namespace AntFarm.main
                 }
                 return;
             }
+
+            // Try to pick up food from Farm entity
+            var farms = cell.Entities.OfType<farm>().ToList();
+            foreach (var farmEntity in farms)
+            {
+                int spaceleft = ant.carryingcapacity - ant.foodcarried;
+                if (spaceleft > 0 && farmEntity.FoodContained > 0)
+                {
+                    int take = Math.Min(spaceleft, farmEntity.FoodContained);
+                    ant.foodcarried += take;
+                    farmEntity.FoodContained -= take;
+                    farmEntity.virtFoodContained -= take;
+                }
+                return;
+            }
         }
+        
         private void PerformTaskWork(Ant ant)
         {
             if (ant.Currenttask == null) return;
@@ -746,6 +736,7 @@ namespace AntFarm.main
 
                     try
                     {
+                        // gather for food 
                         var foodCell = grid.GetCellAtLocation(tx, ty);
 
                         var foodStore = foodCell.Entities.OfType<FoodStore>().FirstOrDefault(s => s.foodcontained > 0);
@@ -764,7 +755,7 @@ namespace AntFarm.main
                             return;
                         }
 
-                        // --- NEW: Allow gathering food from Farms ---
+                        // gather for famr
                         var farmStore = foodCell.Entities.OfType<farm>().FirstOrDefault(f => f.FoodContained > 0);
                         if (farmStore != null)
                         {
@@ -780,7 +771,7 @@ namespace AntFarm.main
                             ant.path = null;
                             return;
                         }
-                        // --------------------------------------------
+                      
 
                         var foodEntity = foodCell.Entities.OfType<Food>().FirstOrDefault();
                         if (foodEntity != null)
@@ -806,7 +797,7 @@ namespace AntFarm.main
                     }
                     catch
                     {
-                        // ignore
+                        
                     }
 
                     ant.Currenttask = null;
@@ -821,10 +812,10 @@ namespace AntFarm.main
                         var q = ant as Queen;
                         if (q == null) return;
 
-                        // Only the queen should ever have this task, but double-check
+                        // Only the queen should ever have this task
                         if (!(ant is Queen)) return;
 
-                        // Helper: Find a valid underground open cell (not dirt, not occupied by farms/stores/food)
+                        //Find a valid underground open cell (not dirt, not occupied by farms/stores/food)
                         (int x, int y)? FindUndergroundTarget()
                         {
                             var candidates = new List<(int, int)>();
@@ -847,7 +838,7 @@ namespace AntFarm.main
                             return candidates[rand.Next(candidates.Count)];
                         }
 
-                        // Validate current target cell. If invalid, try to pick a new valid underground cell.
+                        // Validate current target cell If invalid, try to pick a new valid underground cell
                         bool currentTargetValid =
                             grid.IsInGridRange(task.targetposition.Item1, task.targetposition.Item2) &&
                             UnderGAndopen(task.targetposition, grid.height) &&
@@ -855,13 +846,13 @@ namespace AntFarm.main
                             !grid.GetCellAtLocation(task.targetposition.Item1, task.targetposition.Item2).Entities.OfType<farm>().Any() &&
                             !grid.GetCellAtLocation(task.targetposition.Item1, task.targetposition.Item2).Entities.OfType<Food>().Any();
 
-                        // IMPORTANT: If the queen is already standing on a valid target, we should NOT pick a new target.
+                        //If the queen is already standing on a valid target dnt pick a new target.
                         if (!currentTargetValid)
                         {
                             var newTarget = FindUndergroundTarget();
                             if (newTarget == null)
                             {
-                                // No valid underground place — fallback to wander
+                                //No valid underground place fallback to wander
                                 antwander(q);
                                 return;
                             }
@@ -869,7 +860,7 @@ namespace AntFarm.main
                             ant.path = null;
                         }
 
-                        // If not at target, pathfind and move
+                        // If not at target pathfind and move
                         if (q.Position != ant.Currenttask.targetposition)
                         {
                             try
@@ -878,7 +869,7 @@ namespace AntFarm.main
                             }
                             catch
                             {
-                                // Can't reach, clear task and clear retreating flag
+                                // cant reach therfore clear task and clear retreating flag
                                 ant.Currenttask = null;
                                 ant.clamedtaskid = -1;
                                 ant.path = null;
@@ -888,15 +879,15 @@ namespace AntFarm.main
                             return;
                         }
 
-                        // At target: begin gestation if needed
+                        //  begin gestation 
                         if (q.gestationperiod <= 0)
                         {
-                            q.gestationperiod = 19; // start gestation
+                            q.gestationperiod = 19; 
                         }
 
                         // Prevent movement while gestating/laying
-                        ant.path = new List<int>(); // prevent movement while working
-                        // Decrement gestationperiod and check for egg laying
+                        ant.path = new List<int>(); 
+                        
                         q.gestationperiod--;
 
                         
@@ -909,17 +900,17 @@ namespace AntFarm.main
                             ant.clamedtaskid = -1;
                             ant.path = null;
                             q.retreting = false;
-                            Console.WriteLine($"Queen laid eggs at ({q.Position.Item1},{q.Position.Item2})");
+                           
                         }
                         return;
                     }
 
                 case "foodstoregather":
-                    // remember the store target
+                    
                     if (ant.FoodStoreTarget == null)
                         ant.FoodStoreTarget = task.targetposition;
 
-                    // Phase 1: find & go fill from nearest raw source (food or farm)
+                    //1 find nerest food/farm that has food innit
                     if (!ant.FillingFromSource && ant.foodcarried < ant.carryingcapacity)
                     {
                         Food closestFood = null;
@@ -978,7 +969,7 @@ namespace AntFarm.main
                         return;
                     }
 
-                    // Phase 2: move to source and fill
+                    // move to source and fill
                     if (ant.FillingFromSource)
                     {
                         if (ant.Position != ant.Currenttask.targetposition)
@@ -1010,7 +1001,7 @@ namespace AntFarm.main
                         return;
                     }
 
-                    // Phase 3: deliver to store
+                    //  deliver to store
                     if (ant.FoodStoreTarget.HasValue)
                     {
                         if (ant.Position != ant.FoodStoreTarget.Value)
@@ -1044,7 +1035,7 @@ namespace AntFarm.main
                     ant.FillingFromSource = false;
                     return;
                 case "farmwork":
-                    // Need to be standing on the farm to work. If not there, path to it.
+                    // Need to be standing on the farm to work If not there path to it.
                     if (ant.Position != task.targetposition)
                     {
                         try
@@ -1053,7 +1044,7 @@ namespace AntFarm.main
                         }
                         catch
                         {
-                            // can't reach the farm — release the task
+                            // cant reach the farm  release the task
                             ant.Currenttask = null;
                             ant.clamedtaskid = -1;
                             ant.path = null;
@@ -1061,7 +1052,7 @@ namespace AntFarm.main
                         return;
                     }
 
-                    // At farm position — find the farm entity and mark it as being worked.
+                    // At farm position find the farm entity and mark it as being worked.
                     var farmCell = grid.GetCellAtLocation(tx, ty);
                     var farmEntity = farmCell.Entities.OfType<farm>().FirstOrDefault();
                     if (farmEntity != null)
@@ -1070,7 +1061,7 @@ namespace AntFarm.main
                     }
 
                     // Check queue for any higher-priority task:
-                    // anything that is NOT "wander" and NOT "foodstoregather" is considered higher priority.
+                    // anything that is NOT "wander" and NOT "foodstoregather" is considered higher priority (as in past ants used to sit on the farm untill they died)
                     var urgentTask = queue1.tasks
                         .FirstOrDefault(t => t.id != ant.clamedtaskid
                                              && !string.Equals(t.tasktype, "wander", StringComparison.OrdinalIgnoreCase)
@@ -1089,12 +1080,11 @@ namespace AntFarm.main
                         return;
                     }
 
-                    // No urgent work — remain assigned to farm and don't move.
-                    // Keep the ant assigned so it continues to work until interrupted.
-                    ant.path = new List<int>(); // prevent movement while working
+                   
+                    ant.path = new List<int>(); 
                     return;
 
-                case "buildfarm": // build food store
+                case "buildfarm": 
                     if (!IsAdjacentOrOn(ant.Position, task.targetposition))
                     {
                         try { pathfind(ant); }
@@ -1120,7 +1110,7 @@ namespace AntFarm.main
                     ant.path = null;
                     return;
 
-                case "buildfoodstore": // build food store
+                case "buildfoodstore": 
                     if (!IsAdjacentOrOn(ant.Position, task.targetposition))
                     {
                         try { pathfind(ant); }
@@ -1166,13 +1156,9 @@ namespace AntFarm.main
             }
         }
 
-        private void CompleteAntTask(Ant ant)
-        {
-            
-            PerformTaskWork(ant);
-        }
+       
 
-        // Gathers all Ant instances currently in the grid.
+        // Gathers all Ant instances currently in the grid helpful allot
         private List<Ant> GetAllAnts()
         {
             List<Ant> ants = new List<Ant>();
@@ -1192,158 +1178,14 @@ namespace AntFarm.main
             }
             return ants;
         }
-        /*
-         * need to add food tasks for ant 
-         * within the ant if the ant has less then 2 food then it will create a gather food task and add it to itself if it already has a task it should add it back to the queue 
-         * if there is a food store ant should gather from that before gathering from random food on the grid
-         * if there is no more task in queue the ant should gather food from the nearest food source and add it to a food store 
-         * player should also be able to add food tasks manually which will go to the back of the queue (low priority)
-         * */
+        
 
         public void AddEntityToGameGrid(int x, int y, Entity entity)
         {
             grid.AddEntityToCellLocation(x, y, entity);
         }
-        public (int, int) UserInputCords()
-        {
-            int X, Y;
+        
 
-            // get x from user with validation
-            while (true)
-            {
-                Console.Write("X cord: ");
-                var sx = Console.ReadLine();
-                if (!int.TryParse(sx, out X))
-                {
-                    Console.WriteLine("Please enter a valid integer for X.");
-                    continue;
-                }
-
-                if (X < 0 || X >= grid.width)
-                {
-                    Console.WriteLine($"X out of range (0 .. {grid.width - 1}). Please enter again.");
-                    continue;
-                }
-
-                break;
-            }
-
-            // get y from user with validation
-            while (true)
-            {
-                Console.Write("Y cord: ");
-                var sy = Console.ReadLine();
-                if (!int.TryParse(sy, out Y))
-                {
-                    Console.WriteLine("Please enter a valid integer for Y.");
-                    continue;
-                }
-
-                if (Y < 0 || Y >= grid.height)
-                {
-                    Console.WriteLine($"Y out of range (0 .. {grid.height - 1}). Please enter again.");
-                    continue;
-                }
-
-                break;
-            }
-
-            return (X, Y);
-        }
-
-
-
-        public void inputselector()
-        {
-            Console.WriteLine("1 : order the ants to dig \n2: order ants to make a food store \n3: select a cord to get the info of \n4: create a farm \n5: delete valid entiry from position (farms/foodstores) \nanything else : end tick ");
-            var input = Console.ReadKey(true);
-
-            if (input.KeyChar == '1')
-            {
-                Console.WriteLine("please enter the x and y position of the thing you want to dig ");
-                (int, int) cords = UserInputCords();
-                algorithm.Task digtask = new algorithm.Task(queue1.lasttaskid++, "dig", (cords.Item1, cords.Item2));
-                
-                // enqueue the task so ProcessAntMovementAndTasks will assign it
-                queue1.addtask(digtask);
-                Console.WriteLine($"Queued dig task #{digtask.id} at ({cords.Item1},{cords.Item2})");
-            }
-            else if (input.KeyChar == '2')
-            {
-                Console.WriteLine("please enter the x and y position of the thing you want to add food store ");
-                (int, int) cords = Fullinput4building();
-                algorithm.Task buildtask = new algorithm.Task(queue1.lasttaskid++, "buildfoodstore", (cords.Item1, cords.Item2));
-
-                // enqueue the build task
-                queue1.addtask(buildtask);
-                Console.WriteLine($"Queued build task #{buildtask.id} at ({cords.Item1},{cords.Item2})");
-            }
-            else if (input.KeyChar == '3')
-            {
-                Console.WriteLine("please enter the x and y position of the thing you want to get info on  ");
-                (int, int) cords = UserInputCords();
-                var cell = grid.GetCellAtLocation(cords.Item1, cords.Item2);
-                Console.WriteLine($"Cell at ({cords.Item1},{cords.Item2}): Type={cell.GetType().Name}, Entities={cell.Entities.Count}");
-                foreach (var entity in cell.Entities)
-                {
-                    Console.WriteLine($" - Entity ID={entity.Id}, Type={entity.GetType().Name}, Symbol={entity.Symbol}");
-                    if (entity is Ant ant)
-                    {
-                        Console.WriteLine($"   - Ant Food={ant.food}, Current Task ID={ant.clamedtaskid}");
-                    }
-                    else if (entity is Food food)
-                    {
-                        Console.WriteLine($"   - Food Amount={food.currentAmount}");
-                    }
-                    else if (entity is FoodStore store)
-                    {
-                        Console.WriteLine($"   - FoodStore Contained={store.foodcontained}, Capacity={store.capacity}");
-                    }
-                    else if (entity is farm farmEntity)
-                    {
-                        Console.WriteLine($"   - Farm FoodContained={farmEntity.FoodContained}, ticks to next harvest={farmEntity.TickToNextHarvest}, AntWorking={farmEntity.antWorking} Ant has been working for {farmEntity.antbeenworkingforXticks} ticks");
-                    }
-                }
-            }
-            else if (input.KeyChar == '4')
-            {
-                Console.WriteLine("please enter the x and y position of the place you want to add farm to ");
-                (int, int) cords = Fullinput4building();
-                algorithm.Task buildtask = new algorithm.Task(queue1.lasttaskid++, "buildfarm", (cords.Item1, cords.Item2));
-
-                // enqueue the build task
-                queue1.addtask(buildtask);
-                Console.WriteLine($"Queued build task #{buildtask.id} at ({cords.Item1},{cords.Item2})");
-
-            }
-            else if (int.TryParse(input.KeyChar.ToString(), out int num) && num == 5)
-            {
-                Console.WriteLine("please enter the x and y position of the place you want to remove an entity from (farms/foodstores) ");
-                (int, int) cords = UserInputCords();
-                var cell = grid.GetCellAtLocation(cords.Item1, cords.Item2);
-                var farmEntity = cell.Entities.OfType<farm>().FirstOrDefault();
-                if (farmEntity != null)
-                {
-                    cell.RemoveEntity(farmEntity);
-                    Console.WriteLine($"Removed farm at ({cords.Item1},{cords.Item2})");
-                    return;
-                }
-                var storeEntity = cell.Entities.OfType<FoodStore>().FirstOrDefault();
-                if (storeEntity != null)
-                {
-                    cell.RemoveEntity(storeEntity);
-                    Console.WriteLine($"Removed food store at ({cords.Item1},{cords.Item2})");
-                    return;
-                }
-                Console.WriteLine($"No farm or food store found at ({cords.Item1},{cords.Item2}) to remove.");
-            }
-            else
-            {
-                Console.Clear();
-                grid.PrintGrid();
-                tick++;
-            }
-        }
         public void HungerAnts()
         {
             List<Ant> ants = GetAllAnts();
@@ -1409,7 +1251,7 @@ namespace AntFarm.main
         {
             if (!grid.IsInGridRange(x, y))
                 throw new ArgumentOutOfRangeException(nameof(x), "Position out of grid range.");
-            // where to add the onlyunder ground limit 
+           
 
             
             var fs = new FoodStore(++lastEntityId, 'S');
@@ -1430,10 +1272,7 @@ namespace AntFarm.main
         }
 
 
-        public void printgrid()
-        {
-            grid.PrintGrid();
-        }
+        
         public void antwander(Ant ant)
         {
             if (queue1.tasks.Count < GetAllAnts().Count && ant.clamedtaskid == -1)
@@ -1845,41 +1684,3 @@ namespace AntFarm.main
     }
 
 }
-/* old main stuff
- * internal class Program
-{
-    private static void Main(string[] args)
-    {
-        Console.WriteLine("Neah Ant Colony Simulation");
-        Console.WriteLine("--------------------------");
-        Console.WriteLine("enter width then height of sim");
-        int width = 0;
-        int height = 0;
-        bool validInput = false;
-        while (!(validInput))
-        {
-            Console.WriteLine("Please enter a valid integer for width and height (greater then 4x4):");
-            if ((int.TryParse(Console.ReadLine(), out int w) && int.TryParse(Console.ReadLine(), out int h)&&(w >= 4) && (h>= 4)))
-            {
-                validInput = true;
-                Console.WriteLine($"Width: {w}, Height: {h}");
-                width = w;
-                height = h;
-            }
-            else
-            {
-                Console.WriteLine("Invalid input. Please enter integers for width and height.");
-            }
-        }
-        
-        Console.ReadLine();
-        Game game = new Game(width, height);
-        game.Initialise_Game();
-        game.Run();
-        Console.ReadLine();
-       
-    }
-    
-
-}
-*/

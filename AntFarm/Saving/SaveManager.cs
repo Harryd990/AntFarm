@@ -122,11 +122,11 @@ namespace AntFarm.Saving
             {
                 string jsonString = JsonSerializer.Serialize(gameSave, jsonOptions);
                 File.WriteAllText(fullPath, jsonString);
-                Console.WriteLine($"Game saved successfully to: {fullPath}");
+                
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Failed to save game: {ex.Message}");
+               
             }
         }
 

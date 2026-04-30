@@ -91,17 +91,7 @@ namespace AntFarm
             }
             return output;
         }
-        public void PrintGrid()
-        {
-            for (int y = 0; y < height; y++)
-            {
-                for (int x = 0; x < width; x++)
-                {
-                    Console.Write(cells[x, y].Symbol);
-                }
-                Console.WriteLine();
-            }
-        }
+       
         public void ConvertToAir(int x, int y)
         {
             cells[x, y] = new Air(x, y);
