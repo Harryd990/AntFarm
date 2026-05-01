@@ -20,7 +20,9 @@
                 In this game, u take the role of an observer guiding your own ant colony.
                 Your ants will automaticaly gather for food and the queen will produce new ants, but you can directly control the colony's expansion using the "Actions" panel, And if you are bad at the game you can use the "Dev tools pannel" to make up for your lack of skill.
                 <LineBreak/><LineBreak/>
-                Command your ants to dig tunnels, construct farms above ground to harvest food, and build food storages underground. Keep your ants well-fed so the colony survives, and manage the colony's capacity to build an underground empire!
+                Command your ants to dig tunnels, construct farms above ground to harvest food, and build food storages underground. Keep your ants well-fed so the colony survives, and manage the colony's rescources to build an underground empire!
+                <LineBreak/><LineBreak/>
+                After pressing a button (eg dig) a red border will show up round the canvas, click on the grid to give the ants said task, then when your done please right click to exit build mode. Also, you can use the left and right arrow keys to control the speed slider if you wish
             </TextBlock>
         </Border>
 
@@ -63,7 +65,10 @@
                         <!-- Queen Ant -->
                         <Border Style="{StaticResource TableRow}">
                             <Grid>
-                                <Grid.ColumnDefinitions> <ColumnDefinition Width="*"/> <ColumnDefinition Width="150"/> </Grid.ColumnDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="150"/>
+                                </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Column="0" Text="Queen Ant (Creates new ants)" Style="{StaticResource EntityName}"/>
                                 <Ellipse Grid.Column="1" Fill="Yellow" Width="28" Height="28" HorizontalAlignment="Center" Stroke="Black" StrokeThickness="0.5"/>
                             </Grid>
@@ -72,7 +77,10 @@
                         <!-- Worker Ant -->
                         <Border Style="{StaticResource TableRow}">
                             <Grid>
-                                <Grid.ColumnDefinitions> <ColumnDefinition Width="*"/> <ColumnDefinition Width="150"/> </Grid.ColumnDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="150"/>
+                                </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Column="0" Text="Worker Ant" Style="{StaticResource EntityName}"/>
                                 <Ellipse Grid.Column="1" Fill="DarkGray" Width="28" Height="28" HorizontalAlignment="Center" Stroke="Black" StrokeThickness="0.5"/>
                             </Grid>
@@ -81,7 +89,10 @@
                         <!-- Eggs -->
                         <Border Style="{StaticResource TableRow}">
                             <Grid>
-                                <Grid.ColumnDefinitions> <ColumnDefinition Width="*"/> <ColumnDefinition Width="150"/> </Grid.ColumnDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="150"/>
+                                </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Column="0" Text="Ant Eggs (Hatch into new workers)" Style="{StaticResource EntityName}"/>
                                 <Grid Grid.Column="1" Width="40" Height="40">
                                     <Ellipse Fill="White" Stroke="Black" StrokeThickness="0.5" Width="10" Height="10" Margin="-12,0,0,-8" HorizontalAlignment="Center" VerticalAlignment="Center" />
@@ -94,7 +105,10 @@
                         <!-- Farm -->
                         <Border Style="{StaticResource TableRow}">
                             <Grid>
-                                <Grid.ColumnDefinitions> <ColumnDefinition Width="*"/> <ColumnDefinition Width="150"/> </Grid.ColumnDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="150"/>
+                                </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Column="0" Text="Farm generates food (must be above ground)" Style="{StaticResource EntityName}"/>
                                 <Grid Grid.Column="1" Width="40" Height="40">
                                     <Polygon Fill="ForestGreen" Stroke="Black" StrokeThickness="0.5" Points="20,4 36,12 36,28 20,36 4,28 4,12" />
@@ -106,7 +120,10 @@
                         <!-- Food Store -->
                         <Border Style="{StaticResource TableRow}">
                             <Grid>
-                                <Grid.ColumnDefinitions> <ColumnDefinition Width="*"/> <ColumnDefinition Width="150"/> </Grid.ColumnDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="150"/>
+                                </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Column="0" Text="Food Store stockpiles food (must be below ground)" Style="{StaticResource EntityName}"/>
                                 <Grid Grid.Column="1" Width="40" Height="40">
                                     <Polygon Fill="SaddleBrown" Stroke="Black" StrokeThickness="0.5" Points="20,4 36,12 36,28 20,36 4,28 4,12" />
@@ -118,7 +135,10 @@
                         <!-- Natural Food Node -->
                         <Border Style="{StaticResource TableRow}">
                             <Grid>
-                                <Grid.ColumnDefinitions> <ColumnDefinition Width="*"/> <ColumnDefinition Width="150"/> </Grid.ColumnDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="150"/>
+                                </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Column="0" Text="Natural Food Node " Style="{StaticResource EntityName}"/>
                                 <Grid Grid.Column="1" Width="40" Height="40">
                                     <Ellipse Fill="Orange" Stroke="Black" StrokeThickness="0.5" Width="10" Height="10" Margin="-10,0,0,8" HorizontalAlignment="Center" VerticalAlignment="Bottom" />
@@ -130,11 +150,14 @@
                                 </Grid>
                             </Grid>
                         </Border>
-                        
+
                         <!-- Action Marker -->
                         <Border Style="{StaticResource TableRow}">
                             <Grid>
-                                <Grid.ColumnDefinitions> <ColumnDefinition Width="*"/> <ColumnDefinition Width="150"/> </Grid.ColumnDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="150"/>
+                                </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Column="0" Text="Planned Action Mark (Dig/Build Here)" Style="{StaticResource EntityName}"/>
                                 <Grid Grid.Column="1" Width="40" Height="40">
                                     <Line X1="6" Y1="6" X2="34" Y2="34" Stroke="Red" StrokeThickness="4" StrokeEndLineCap="Round" StrokeStartLineCap="Round" />
@@ -146,7 +169,10 @@
                         <!-- Dirt -->
                         <Border Style="{StaticResource TableRow}">
                             <Grid>
-                                <Grid.ColumnDefinitions> <ColumnDefinition Width="*"/> <ColumnDefinition Width="150"/> </Grid.ColumnDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="150"/>
+                                </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Column="0" Text="Dirt Cell" Style="{StaticResource EntityName}"/>
                                 <Rectangle Grid.Column="1" Fill="#A0522D" Stroke="#1E1E1E" StrokeThickness="0.5" Width="40" Height="40" />
                             </Grid>
@@ -155,7 +181,10 @@
                         <!-- Stone -->
                         <Border Style="{StaticResource TableRow}">
                             <Grid>
-                                <Grid.ColumnDefinitions> <ColumnDefinition Width="*"/> <ColumnDefinition Width="150"/> </Grid.ColumnDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="150"/>
+                                </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Column="0" Text="Stone Cell (like dirt but takes longer to dig)" Style="{StaticResource EntityName}"/>
                                 <Rectangle Grid.Column="1" Fill="#A9A9A9" Stroke="#1E1E1E" StrokeThickness="0.5" Width="40" Height="40" />
                             </Grid>
@@ -164,16 +193,22 @@
                         <!-- Above-Ground Air -->
                         <Border Style="{StaticResource TableRow}">
                             <Grid>
-                                <Grid.ColumnDefinitions> <ColumnDefinition Width="*"/> <ColumnDefinition Width="150"/> </Grid.ColumnDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="150"/>
+                                </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Column="0" Text="Air Cell (Above Ground)" Style="{StaticResource EntityName}"/>
                                 <Rectangle Grid.Column="1" Fill="#A9F56E" Stroke="#1E1E1E" StrokeThickness="0.5" Width="40" Height="40" />
                             </Grid>
                         </Border>
-                        
+
                         <!-- Below-Ground Air (Tunnels) -->
                         <Border Style="{StaticResource TableRow}" BorderThickness="0">
                             <Grid>
-                                <Grid.ColumnDefinitions> <ColumnDefinition Width="*"/> <ColumnDefinition Width="150"/> </Grid.ColumnDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="150"/>
+                                </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Column="0" Text="Air Cell (Underground Tunnel)" Style="{StaticResource EntityName}"/>
                                 <Rectangle Grid.Column="1" Fill="#947D65" Stroke="#1E1E1E" StrokeThickness="0.5" Width="40" Height="40" />
                             </Grid>

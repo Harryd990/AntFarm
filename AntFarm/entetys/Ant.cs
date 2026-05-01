@@ -43,8 +43,17 @@ namespace AntFarm.entetys
         {
             int fdneedtotrans = 0;
             fdneedtotrans = maxfood - food;
-            carryingcapacity = carryingcapacity - fdneedtotrans;
-            food = food + fdneedtotrans;
+            if(foodcarried >0 && foodcarried >= fdneedtotrans)
+            {
+                foodcarried = foodcarried - fdneedtotrans;
+                food = food + fdneedtotrans;
+            }
+            if(foodcarried > 0 && foodcarried < fdneedtotrans)
+            {
+                food = food + foodcarried;
+                foodcarried = 0;
+            }
+
         }
         
         
