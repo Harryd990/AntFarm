@@ -356,7 +356,14 @@ namespace AntFarm
 
                 // Cal save manager
                 var saver = new AntFarm.Saving.SaveManager();
-                saver.SaveGame(_game, filename);
+                bool saveSuccessful = saver.SaveGame(_game, filename);
+
+                if (!saveSuccessful)
+                {
+                    MessageBox.Show("Invalid file name. Please try again avoiding characters like *, ?, <, >, |, \\, :, \", /", "Save Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    // Request input again by stopping the process here and keeping the window open
+                    return;
+                }
 
                 OnGameLogMessage($"Game logic saved to {filename}");
                 inputWindow.Close();
@@ -751,7 +758,7 @@ namespace AntFarm
             StackPanel panel = new StackPanel { Margin = new Thickness(15) };
 
             // Dictionary to hold functions for applying changes back to the properties 
-            // Key: Property name, Value: ( TextBox containing new value)
+            // Key: Property name, Value: (TextBox containing new value)
             var intPropertiesToSave = new Dictionary<string, (Action<int>, TextBox)>();
 
             void AddEditableIntProperty(string propName, int startValue, Action<int> setter)

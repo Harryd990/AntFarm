@@ -1,8 +1,8 @@
-using System;
 using System.IO;
 using System.Text.Json;
 using AntFarm.entetys;
 using AntFarm.main;
+using System;
 
 namespace AntFarm.Saving
 {
@@ -13,16 +13,21 @@ namespace AntFarm.Saving
             WriteIndented = true // Formats the JSON to be readable
         };
 
-        public void SaveGame(Game game, string filePath = "autosave.json")
+        public bool SaveGame(Game game, string filePath = "autosave.json")
         {
-            // Always target the Documents folder
+            // Check if the file name contains any illegal characters (like *, ?, <, >, |, etc.)
+            if (!string.IsNullOrWhiteSpace(filePath) && Path.GetFileName(filePath).IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
+            {
+                return false;
+            }
+
+            // go for doc folder
             string documentsFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             string saveDirectory = Path.Combine(documentsFolder, "AntFarmSaves");
             
-            // Ensure the directory exists
             Directory.CreateDirectory(saveDirectory); 
 
-            // If the UI passes just a filename (e.g., "save1.json"), we combine it with the Document's save directory.
+            // If the UI passes just a filename (eg save1.json) we combine it with the Document's save directory.
             
             string safeFileName = string.IsNullOrWhiteSpace(filePath) ? "autosave.json" : Path.GetFileName(filePath);
             
@@ -123,11 +128,11 @@ namespace AntFarm.Saving
             {
                 string jsonString = JsonSerializer.Serialize(gameSave, jsonOptions);
                 File.WriteAllText(fullPath, jsonString);
-                
+                return true;
             }
             catch (Exception ex)
             {
-               
+               return false;
             }
         }
 
