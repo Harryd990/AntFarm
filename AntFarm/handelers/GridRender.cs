@@ -83,7 +83,7 @@ namespace AntFarm.handelers
 
                     Brush fillBrush;
                     // If it's Air and in the bottom 3/4 of the grid, use the underground color
-                    if (string.Equals(cellType, "Air", StringComparison.OrdinalIgnoreCase) && y > rows / 4.0)
+                    if (string.Equals(cellType, "Air", StringComparison.OrdinalIgnoreCase) && y >= rows / 4.0)
                     {
                         fillBrush = UndergroundAirBrush;
                     }
